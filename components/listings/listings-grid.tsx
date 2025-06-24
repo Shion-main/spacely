@@ -256,11 +256,13 @@ export function ListingsGrid({ listings, currentPage, totalPages, totalCount, se
                   </div>
                 )}
 
-                {/* Owner */}
-                <div className="flex items-center text-sm text-gray-600 mb-4">
-                  <User className="w-4 h-4 mr-2 text-blue-500" />
-                  <span>By {listing.users?.full_name || 'Unknown'}</span>
-                </div>
+                {/* Owner (first name only) */}
+                {listing.users?.full_name && (
+                  <div className="flex items-center text-sm text-gray-600 mb-4">
+                    <User className="w-4 h-4 mr-2 text-blue-500" />
+                    <span>By {listing.users.full_name.split(' ')[0]}</span>
+                  </div>
+                )}
 
                 {/* View Details Button */}
                 <Link href={`/listings/${listing.post_id}`}>

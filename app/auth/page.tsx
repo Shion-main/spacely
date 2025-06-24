@@ -13,6 +13,7 @@ import { userLoginSchema, userRegistrationSchema, adminLoginSchema, type UserLog
 import { Eye, EyeOff, Loader2, MapPin, Users, Shield, Star, ShieldCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 export default function AuthPage() {
   const searchParams = useSearchParams()
@@ -25,6 +26,8 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [isTermsOpen, setIsTermsOpen] = useState(false)
   const [departments, setDepartments] = useState<any[]>([])
   const [courses, setCourses] = useState<any[]>([])
   const { signIn } = useAuth()
@@ -228,6 +231,10 @@ export default function AuthPage() {
   }
 
   const onRegisterSubmit = async (data: UserRegistrationInput) => {
+    if (!termsAccepted) {
+      toast.error('You must accept the Terms and Conditions to continue')
+      return
+    }
     setIsLoading(true)
     try {
       const response = await fetch('/api/auth/register', {
@@ -705,25 +712,46 @@ export default function AuthPage() {
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Submit Button */}
-          <div className="mt-6">
-            <Button
-              type="submit"
-              className="w-full spacely-btn-primary transition-all duration-200 hover:scale-105 py-3"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Creating Account...
-                </>
-              ) : (
-                'Create Account'
-              )}
-            </Button>
+              {/* Terms & Conditions */}
+              <div className="flex items-start mt-2">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded mt-1"
+                />
+                <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
+                  I agree to the{' '}
+                  <button
+                    type="button"
+                    onClick={() => setIsTermsOpen(true)}
+                    className="font-medium text-blue-600 hover:underline"
+                  >
+                    Terms and Conditions
+                  </button>
+                </label>
+              </div>
+
+              {/* Submit Button */}
+              <div className="mt-6">
+                <Button
+                  type="submit"
+                  className="w-full spacely-btn-primary transition-all duration-200 hover:scale-105 py-3"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Creating Account...
+                    </>
+                  ) : (
+                    'Create Account'
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
         </form>
 
@@ -738,6 +766,72 @@ export default function AuthPage() {
             </button>
           </p>
         </div>
+
+        {/* Terms Dialog */}
+        <Dialog open={isTermsOpen} onOpenChange={setIsTermsOpen}>
+          <DialogContent className="max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Spacely Terms and Conditions</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 text-sm leading-6 text-gray-700">
+              <p>
+                Welcome to Spacely! By creating an account and using our services, you agree to the following
+                terms and conditions. Please read them carefully.
+              </p>
+              <ol className="list-decimal list-inside space-y-2">
+                <li>
+                  <strong>Eligibility&nbsp;–</strong> You must be at least 18&nbsp;years old and a verified student
+                  or staff member of Mapua Malayan Colleges Mindanao to create an account.
+                </li>
+                <li>
+                  <strong>Account Security&nbsp;–</strong> You are responsible for maintaining the confidentiality
+                  of your login credentials and for all activities that occur under your account.
+                </li>
+                <li>
+                  <strong>Acceptable Use&nbsp;–</strong> You agree not to upload, post, or share any content that
+                  is unlawful, false, misleading, defamatory, or infringing on another person's rights. We reserve
+                  the right to remove content that violates these rules.
+                </li>
+                <li>
+                  <strong>Listing Accuracy&nbsp;–</strong> If you post a property listing, you warrant that all
+                  information provided is accurate and up-to-date. Misleading listings may be removed without
+                  notice.
+                </li>
+                <li>
+                  <strong>Favorites & Reports&nbsp;–</strong> The favorites and report features are provided for
+                  personal use. Abuse of these features (e.g., spam-reporting) may lead to account suspension.
+                </li>
+                <li>
+                  <strong>Intellectual Property&nbsp;–</strong> All trademarks, logos, and content on Spacely
+                  remain the property of their respective owners. You may not copy or distribute any part of the
+                  platform without prior written consent.
+                </li>
+                <li>
+                  <strong>Termination&nbsp;–</strong> We may suspend or terminate your account at any time for
+                  violations of these terms or for any behavior that we deem harmful to the community.
+                </li>
+                <li>
+                  <strong>Disclaimer&nbsp;–</strong> Spacely acts only as a venue for listing and discovering
+                  rentals. We do not own, manage, or inspect the properties listed. Interactions and agreements
+                  between renters and landlords happen independently of Spacely.
+                </li>
+                <li>
+                  <strong>Limitation of Liability&nbsp;–</strong> To the fullest extent permitted by law, Spacely
+                  shall not be liable for any indirect, incidental, or consequential damages arising from your use
+                  of the platform.
+                </li>
+                <li>
+                  <strong>Changes to Terms&nbsp;–</strong> We may update these terms from time to time. Continued
+                  use of the service after any changes constitutes acceptance of the new terms.
+                </li>
+              </ol>
+              <p>
+                By clicking "Create Account," you acknowledge that you have read, understood, and agree to be
+                bound by these Terms and Conditions.
+              </p>
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   )

@@ -402,7 +402,7 @@ export default function ListingDetailsPage() {
               <Card className="shadow-xl bg-white/80 backdrop-blur-lg">
                 <CardContent className="p-6 space-y-6">
                   {/* Title and Price */}
-                  <div className="flex items-start justify-between">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6">
                     <div className="flex-1">
                       <h1 className="text-2xl font-bold text-gray-900">{listing.title}</h1>
                       <div className="flex items-center mt-2 space-x-2">
@@ -414,7 +414,7 @@ export default function ListingDetailsPage() {
                         </Badge>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                       {/* Action Buttons - Only show for non-owners */}
                       {user && listing.user_id !== user.id && (
                         <>
@@ -447,7 +447,7 @@ export default function ListingDetailsPage() {
                         <Share2 className="w-4 h-4" />
                         Share
                       </Button>
-                      <div className="text-right ml-4">
+                      <div className="text-left sm:text-right sm:ml-4 w-full sm:w-auto">
                         <p className="text-3xl font-bold text-blue-600">₱{listing.price.toLocaleString()}</p>
                         <p className="text-sm text-gray-600">per month</p>
                       </div>
