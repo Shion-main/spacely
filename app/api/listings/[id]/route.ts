@@ -218,10 +218,12 @@ export async function PATCH(
       } else if (key === 'photos_to_delete[]') {
         console.log('Photo to delete received:', value as string);
         photosToDelete.push(value as string)
-      } else if (key === 'custom_amenities[]') {
-        if (!data.custom_amenities) data.custom_amenities = []
-        data.custom_amenities.push(value as string)
-        console.log('Found custom amenity:', value)
+      } else if (key === 'custom_amenities') {
+        try {
+          data.custom_amenities = JSON.parse(value as string)
+        } catch {
+          data.custom_amenities = []
+        }
       } else if (['type_id', 'price', 'number_of_rooms'].includes(key)) {
         data[key] = parseInt(value as string)
       } else if (['latitude', 'longitude'].includes(key)) {
@@ -308,7 +310,7 @@ export async function PATCH(
       }
     }
 
-    // Update amenities array if provided
+    // Determine final amenities array precedence: validatedData.amenities first, else custom_amenities (may be empty array)
     if (validatedData.amenities !== undefined) {
       const { error: amenityError } = await supabase
         .from('posts')
@@ -317,9 +319,15 @@ export async function PATCH(
 
       if (amenityError) {
         console.error('Amenity update error:', amenityError)
-        // Continue with update even if amenity update fails
-      } else {
-        console.log('Successfully updated amenities:', validatedData.amenities)
+      }
+    } else if (data.custom_amenities !== undefined) {
+      const { error: amenityError } = await supabase
+        .from('posts')
+        .update({ amenities: data.custom_amenities })
+        .eq('post_id', id)
+
+      if (amenityError) {
+        console.error('Custom amenity update error:', amenityError)
       }
     }
 

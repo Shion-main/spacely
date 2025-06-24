@@ -317,9 +317,7 @@ export default function EditListingPage() {
       : [];
     console.log('Submitting custom amenities:', currentCustomAmenities);
     
-    currentCustomAmenities.forEach(amenity => {
-      formData.append('custom_amenities[]', amenity);
-    });
+    formData.append('custom_amenities', JSON.stringify(currentCustomAmenities));
 
     selectedImages.forEach(file => {
       formData.append('images', file);
