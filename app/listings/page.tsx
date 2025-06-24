@@ -4,6 +4,7 @@ import { ListingsHeader } from '@/components/listings/listings-header'
 import { ListingsContent } from '@/components/listings/listings-content'
 import { ViewToggle } from '@/components/listings/view-toggle'
 import { SearchBar } from '@/components/navigation/search-bar'
+import { headers } from 'next/headers'
 
 interface SearchParams {
   [key: string]: string | undefined
@@ -15,6 +16,10 @@ interface ListingsPageProps {
 
 export default async function ListingsPage({ searchParams }: ListingsPageProps) {
   const supabase = createClient()
+  const headersList = headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
 
   // Await search parameters
   const resolvedSearchParams = await searchParams
@@ -30,44 +35,86 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
 
   const pageSize = 12
 
-  // Fetch listings via relative API route
-  const params = new URLSearchParams()
-  params.set('page', page.toString())
-  params.set('limit', pageSize.toString())
-  if (search) params.set('search', search)
-  if (city) params.set('city', city)
-  if (roomType) params.set('type_id', roomType)
-  if (priceMin !== undefined) params.set('min_price', priceMin.toString())
-  if (priceMax !== undefined) params.set('max_price', priceMax.toString())
-
+  // Fetch listings directly from Supabase to avoid SSR fetch issues
   let listings: any[] = []
   let totalCount = 0
-  try {
-    const listResponse = await fetch(`/api/listings?${params.toString()}`, {
-      headers: { 'Cache-Control': 'no-cache' }
-    })
-    if (listResponse.ok) {
-      const data = await listResponse.json()
-      listings = data.listings || []
 
-      // Count total results without pagination
-      const countParams = new URLSearchParams()
-      if (search) countParams.set('search', search)
-      if (city) countParams.set('city', city)
-      if (roomType) countParams.set('type_id', roomType)
-      if (priceMin !== undefined) countParams.set('min_price', priceMin.toString())
-      if (priceMax !== undefined) countParams.set('max_price', priceMax.toString())
-      countParams.set('limit', '1000')
-      const countResponse = await fetch(`/api/listings?${countParams.toString()}`)
-      if (countResponse.ok) {
-        const countData = await countResponse.json()
-        totalCount = countData.listings?.length || 0
-      }
+  try {
+    // Build query
+    let query = supabase
+      .from('posts')
+      .select(`
+        post_id,
+        title,
+        description,
+        price,
+        city,
+        barangay,
+        street,
+        latitude,
+        longitude,
+        created_at,
+        users!inner(
+          full_name,
+          phone_number
+        ),
+        rooms!inner(
+          number_of_rooms,
+          bathroom_type,
+          room_types!inner(
+            type_name,
+            display_name
+          )
+        ),
+        photos(
+          file_path,
+          storage_path,
+          is_featured,
+          photo_order
+        ),
+        amenities!left(
+          amenity_id,
+          amenity_name
+        )
+      `)
+      .eq('is_approved', true)
+      .eq('is_deleted', false)
+      .eq('is_flagged', false)
+
+    // Add filters
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,city.ilike.%${search}%,barangay.ilike.%${search}%`)
+    }
+    if (city) {
+      query = query.eq('city', city)
+    }
+    if (roomType) {
+      query = query.eq('rooms.room_types.type_name', roomType)
+    }
+    if (priceMin !== undefined) {
+      query = query.gte('price', priceMin)
+    }
+    if (priceMax !== undefined) {
+      query = query.lte('price', priceMax)
+    }
+
+    // Get total count
+    const { count } = await query
+      .select('*', { count: 'exact', head: true })
+    totalCount = count || 0
+
+    // Get paginated results
+    const { data, error } = await query
+      .order('created_at', { ascending: false })
+      .range((page - 1) * pageSize, page * pageSize - 1)
+
+    if (error) {
+      console.error('Supabase query error:', error)
     } else {
-      console.error('Failed to fetch listings from API:', listResponse.status, listResponse.statusText)
+      listings = data || []
     }
   } catch (error) {
-    console.error('Error fetching listings from API:', error)
+    console.error('Error fetching listings:', error)
   }
 
   const totalPages = Math.ceil(totalCount / pageSize)
