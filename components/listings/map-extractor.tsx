@@ -45,7 +45,6 @@ export function MapExtractor({
       /https?:\/\/(?:www\.)?google\.com\/maps/,
       /https?:\/\/maps\.google\.com/,
       /https?:\/\/maps\.app\.goo\.gl/,
-      /https?:\/\/maps\.apple\.com/
     ]
     return patterns.some(pattern => pattern.test(url))
   }, [])
@@ -150,7 +149,7 @@ export function MapExtractor({
           type="url"
           value={value}
           onChange={onChange}
-          placeholder="Paste Google or Apple Maps link to autofill location"
+          placeholder="Paste Google Maps link to autofill location"
           className="flex-grow"
         />
       </div>
