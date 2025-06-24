@@ -149,7 +149,8 @@ export function MapExtractor({
           type="url"
           value={value}
           onChange={onChange}
-          placeholder="Paste Google Maps link to autofill location"
+          placeholder="Paste Google Maps link to autofill location *"
+          required
           className="flex-grow"
         />
       </div>

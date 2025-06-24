@@ -240,18 +240,18 @@ export function ListingDetailsModal({ isOpen, onClose, listing }: ListingDetails
             <Card>
               <CardContent className="pt-6">
                 <h3 className="text-lg font-semibold mb-4">Amenities</h3>
-                {allAmenities.length > 0 ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {allAmenities.map((amenity, index) => (
-                      <div key={index} className="flex items-center space-x-2 bg-blue-50 rounded-lg px-3 py-2 text-xs font-medium text-gray-900">
-                        <span className="w-2 h-2 bg-blue-500 rounded-full" />
-                        <span className="truncate">{amenity.name}</span>
+                <div className="grid grid-cols-2 gap-4">
+                  {allAmenities.length > 0 ? (
+                    allAmenities.map((amenity, index) => (
+                      <div key={index} className="flex items-center">
+                        {amenity.icon}
+                        <span>{amenity.name}</span>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500">No amenities listed.</p>
-                )}
+                    ))
+                  ) : (
+                    <p className="text-gray-500">No amenities listed.</p>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
