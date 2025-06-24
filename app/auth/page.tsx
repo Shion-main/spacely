@@ -743,19 +743,19 @@ export default function AuthPage() {
   )
 
   return (
-    <div className="min-h-screen bg-white flex relative overflow-hidden">
+    <div className="min-h-screen bg-white flex flex-col md:flex-row relative overflow-hidden">
       {/* Login Form - Fixed Left */}
-      <div className="w-1/2 flex items-center justify-center p-8">
+      <div className={`w-full md:w-1/2 flex items-center justify-center p-8 ${isRegisterMode ? 'hidden md:flex' : ''}`}>
         <LoginForm />
       </div>
 
       {/* Register Form - Fixed Right */}
-      <div className="w-1/2 flex items-center justify-center p-8">
+      <div className={`w-full md:w-1/2 flex items-center justify-center p-8 ${isRegisterMode ? '' : 'hidden md:flex'}`}>
         <RegisterForm />
       </div>
 
       {/* Welcome Panel - Sliding Overlay */}
-      <div className={`absolute top-0 w-1/2 h-full bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-8 smooth-slide z-10 ${
+      <div className={`hidden md:flex absolute top-0 w-full md:w-1/2 h-full bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-8 smooth-slide z-10 ${
         isRegisterMode 
           ? 'left-0 transform translate-x-0' 
           : 'left-1/2 transform translate-x-0'
