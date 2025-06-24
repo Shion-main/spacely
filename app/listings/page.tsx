@@ -1,10 +1,10 @@
 import { Suspense } from 'react'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { ListingsHeader } from '@/components/listings/listings-header'
 import { ListingsContent } from '@/components/listings/listings-content'
 import { ViewToggle } from '@/components/listings/view-toggle'
 import { SearchBar } from '@/components/navigation/search-bar'
-import { headers } from 'next/headers'
 
 interface SearchParams {
   [key: string]: string | undefined
@@ -16,10 +16,6 @@ interface ListingsPageProps {
 
 export default async function ListingsPage({ searchParams }: ListingsPageProps) {
   const supabase = createClient()
-  const headersList = headers()
-  const host = headersList.get('host') || 'localhost:5000'
-  const protocol = headersList.get('x-forwarded-proto') || 'http'
-  const baseUrl = `${protocol}://${host}`
 
   // Await search parameters
   const resolvedSearchParams = await searchParams
@@ -35,86 +31,56 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
 
   const pageSize = 12
 
-  // Fetch listings directly from Supabase to avoid SSR fetch issues
+  // Resolve base URL dynamically when env var is absent (works on Vercel & localhost)
+  const host = headers().get('host') || 'localhost:5000'
+  const protocol = host.includes('localhost') ? 'http' : 'https'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`
+
+  // Build API URL with search parameters
+  const apiUrl = new URL('/api/listings', baseUrl)
+  apiUrl.searchParams.set('page', page.toString())
+  apiUrl.searchParams.set('limit', pageSize.toString())
+  
+  if (search) apiUrl.searchParams.set('search', search)
+  if (city) apiUrl.searchParams.set('city', city)
+  if (roomType) apiUrl.searchParams.set('type_id', roomType)
+  if (priceMin !== undefined) apiUrl.searchParams.set('min_price', priceMin.toString())
+  if (priceMax !== undefined) apiUrl.searchParams.set('max_price', priceMax.toString())
+
+  // Fetch data from our API endpoint (which has the RLS bypass fix)
   let listings: any[] = []
   let totalCount = 0
-
+  
   try {
-    // Build query
-    let query = supabase
-      .from('posts')
-      .select(`
-        post_id,
-        title,
-        description,
-        price,
-        city,
-        barangay,
-        street,
-        latitude,
-        longitude,
-        created_at,
-        users!inner(
-          full_name,
-          phone_number
-        ),
-        rooms!inner(
-          number_of_rooms,
-          bathroom_type
-        ),
-        room_types!inner(
-          type_name,
-          display_name
-        ),
-        photos(
-          file_path,
-          storage_path,
-          is_featured,
-          photo_order
-        ),
-        amenities!left(
-          amenity_id,
-          amenity_name
-        )
-      `)
-      .eq('approval_status', 'approved')
-      .eq('is_deleted', false)
-      .eq('is_flagged', false)
-
-    // Add filters
-    if (search) {
-      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,city.ilike.%${search}%,barangay.ilike.%${search}%`)
-    }
-    if (city) {
-      query = query.eq('city', city)
-    }
-    if (roomType) {
-      query = query.eq('rooms.room_types.type_name', roomType)
-    }
-    if (priceMin !== undefined) {
-      query = query.gte('price', priceMin)
-    }
-    if (priceMax !== undefined) {
-      query = query.lte('price', priceMax)
-    }
-
-    // Get total count
-    const { count } = await query
-      .select('*', { count: 'exact', head: true })
-    totalCount = count || 0
-
-    // Get paginated results
-    const { data, error } = await query
-      .order('created_at', { ascending: false })
-      .range((page - 1) * pageSize, page * pageSize - 1)
-
-    if (error) {
-      console.error('Supabase query error:', error)
+    const response = await fetch(apiUrl.toString(), {
+      headers: {
+        'Cache-Control': 'no-cache'
+      }
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      listings = data.listings || []
+      
+      // Get total count by making a separate query without pagination
+      const countUrl = new URL('/api/listings', baseUrl)
+      if (search) countUrl.searchParams.set('search', search)
+      if (city) countUrl.searchParams.set('city', city)
+      if (roomType) countUrl.searchParams.set('type_id', roomType)
+      if (priceMin !== undefined) countUrl.searchParams.set('min_price', priceMin.toString())
+      if (priceMax !== undefined) countUrl.searchParams.set('max_price', priceMax.toString())
+      countUrl.searchParams.set('limit', '1000') // Large number to get all results for counting
+      
+      const countResponse = await fetch(countUrl.toString())
+      if (countResponse.ok) {
+        const countData = await countResponse.json()
+        totalCount = countData.listings?.length || 0
+      }
     } else {
-      listings = data || []
+      console.error('Failed to fetch listings from API:', response.status, response.statusText)
     }
   } catch (error) {
-    console.error('Error fetching listings:', error)
+    console.error('Error fetching listings from API:', error)
   }
 
   const totalPages = Math.ceil(totalCount / pageSize)
