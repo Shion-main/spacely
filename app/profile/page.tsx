@@ -264,7 +264,7 @@ export default function ProfilePage() {
         <div className="w-full px-3 sm:px-4 lg:px-6 py-8">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center space-x-4">
               <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
                 {profile.full_name.charAt(0).toUpperCase()}
@@ -275,7 +275,7 @@ export default function ProfilePage() {
                 <Badge variant="outline" className="mt-1 capitalize">{profile.role}</Badge>
               </div>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex space-x-3 sm:self-auto self-start">
               <Link href="/profile/edit">
                 <Button variant="outline">
                   <Edit className="w-4 h-4 mr-2" />
@@ -336,8 +336,8 @@ export default function ProfilePage() {
 
         {/* Navigation Tabs */}
         <div className="bg-white rounded-lg shadow-sm mb-8">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-6 px-6">
+          <div className="border-b border-gray-200 overflow-x-auto no-scrollbar">
+            <nav className="-mb-px flex flex-wrap gap-x-6 px-4 sm:px-6">
               <button
                 onClick={() => setActiveTab('listings')}
                 className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${

@@ -317,6 +317,18 @@ export default function EditListingPage() {
       : [];
     console.log('Submitting custom amenities:', currentCustomAmenities);
     
+    // Build full amenities array combining standard toggles and custom
+    const standardAmenities: string[] = [];
+    if (data.has_wifi) standardAmenities.push('WiFi');
+    if (data.has_cctv) standardAmenities.push('CCTV');
+    if (data.is_airconditioned) standardAmenities.push('Air Conditioning');
+    if (data.has_parking) standardAmenities.push('Parking');
+    if (data.has_own_electricity) standardAmenities.push('Own Electricity Meter');
+    if (data.has_own_water) standardAmenities.push('Own Water Meter');
+
+    const finalAmenities = [...standardAmenities, ...currentCustomAmenities];
+
+    formData.append('amenities', JSON.stringify(finalAmenities));
     formData.append('custom_amenities', JSON.stringify(currentCustomAmenities));
 
     selectedImages.forEach(file => {
