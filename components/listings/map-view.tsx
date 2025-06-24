@@ -21,7 +21,7 @@ const loadGoogleMaps = async () => {
     const loader = new Loader({
       apiKey: apiKey,
       version: 'weekly',
-      libraries: ['places', 'marker']
+      libraries: ['places', 'marker', 'routes']
     })
     
     return await loader.load()

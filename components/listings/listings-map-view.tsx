@@ -26,7 +26,7 @@ const loadGoogleMaps = async () => {
     const loader = new Loader({
       apiKey: apiKey,
       version: 'weekly',
-      libraries: ['places']
+      libraries: ['places', 'marker', 'routes']
     })
     
     return await loader.load()
@@ -136,7 +136,7 @@ export function ListingsMapView({ listings }: ListingsMapViewProps) {
     const loader = new Loader({
       apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
       version: "weekly",
-      libraries: ["places", "routes"],
+      libraries: ["places", "marker", "routes"],
     });
 
     loader.load().then(google => {
