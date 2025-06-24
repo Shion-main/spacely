@@ -1,0 +1,36 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# SPACELY System Overview
+
+SPACELY (formerly DWELLY) is a student housing platform built with Next.js 14, TypeScript, and Supabase, specifically designed for Mapua Malayan Colleges Mindanao.
+
+## Architecture
+
+- **Frontend**: Next.js 14 with TypeScript and Tailwind CSS
+- **Backend**: Next.js API routes with server-side rendering
+- **Database**: PostgreSQL via Supabase with Row Level Security (RLS)
+- **Authentication**: Supabase Auth with custom user roles
+- **File Storage**: Supabase Storage for listing images
+
+## Key Entry Points
+
+- **Main App**: [app/layout.tsx](mdc:app/layout.tsx) - Root layout with providers
+- **Home Page**: [app/page.tsx](mdc:app/page.tsx) - Landing page
+- **Authentication**: [app/auth/page.tsx](mdc:app/auth/page.tsx) - Combined login/register
+- **Listings**: [app/listings/page.tsx](mdc:app/listings/page.tsx) - Main listings view
+- **Admin Panel**: [app/admin/dashboard/page.tsx](mdc:app/admin/dashboard/page.tsx) - Admin dashboard
+
+## Core Configuration
+
+- **Database Types**: [lib/database.types.ts](mdc:lib/database.types.ts) - Generated Supabase types
+- **Supabase Client**: [lib/supabase/client.ts](mdc:lib/supabase/client.ts) - Client-side config
+- **Supabase Server**: [lib/supabase/server.ts](mdc:lib/supabase/server.ts) - Server-side config
+- **Validations**: [lib/validations.ts](mdc:lib/validations.ts) - Form validation schemas
+- **Styling**: [app/globals.css](mdc:app/globals.css) - Global styles and Tailwind config
+
+## Legacy System
+
+The [DWELLY/](mdc:DWELLY/) directory contains the legacy Express.js/MySQL system for reference but is not actively used.

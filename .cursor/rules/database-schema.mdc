@@ -1,0 +1,73 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Database Schema & Supabase Patterns
+
+SPACELY uses PostgreSQL via Supabase with Row Level Security (RLS) for secure multi-tenant data access.
+
+## Core Schema
+
+### Users Table
+- **Primary Key**: `user_id` (UUID)
+- **Authentication**: Links to Supabase Auth via email
+- **Roles**: `student` (default) or `admin`
+- **Validation**: Mapua Malayan Colleges Mindanao email (@mcm.edu.ph)
+- **Profile Data**: Full name, student ID, contact info, department, course
+
+### Posts Table (Listings)
+- **Primary Key**: `post_id` (UUID)
+- **Author**: Links to `users.user_id`
+- **Approval Flow**: `pending` → `approved`/`rejected` by admin
+- **Location**: City, barangay, street, coordinates (lat/lng)
+- **Pricing**: Monthly rental price
+- **Contact**: Landlord details and social links
+- **Status Tracking**: Created, approved, archived timestamps
+
+### Rooms Table
+- **Links to**: `posts.post_id`
+- **Room Details**: Number of rooms, bathroom type, furnishing level
+- **Furnishing Enum**: `bare`, `semi_furnished`, `furnished`
+- **Amenities**: Wi-Fi, CCTV, parking availability
+
+### Reference Tables
+- **Room Types**: `room_types` - Condo, apartment, dorm, house, studio, bedspace
+- **Departments/Courses**: Academic program classification
+
+## Supabase Configuration
+
+### Authentication
+- **Client Config**: [lib/supabase/client.ts](mdc:lib/supabase/client.ts) - Browser auth
+- **Server Config**: [lib/supabase/server.ts](mdc:lib/supabase/server.ts) - SSR auth
+- **Middleware**: [lib/supabase/middleware.ts](mdc:lib/supabase/middleware.ts) - Route protection
+
+### Row Level Security (RLS)
+- **Users**: Can read own profile, admins can manage all users
+- **Posts**: Public read for approved, users can CRUD own posts, admins can moderate
+- **Rooms**: Follows post permissions
+- **Photos**: Users can manage own listing photos
+
+### Database Types
+- **Generated Types**: [lib/database.types.ts](mdc:lib/database.types.ts) - Auto-generated from schema
+- **Custom Types**: TypeScript interfaces for API responses and form data
+
+## Common Query Patterns
+
+### Foreign Key Resolution
+Use explicit foreign key names to avoid ambiguity:
+```typescript
+.select(`
+  *,
+  users!posts_user_id_fkey (full_name),
+  room_types (display_name)
+`)
+```
+
+### Filtering & Pagination
+- Approved listings only: `.eq('approval_status', 'approved')`
+- Active listings: `.eq('archived', false).eq('is_deleted', false)`
+- User's own content: `.eq('user_id', userId)`
+
+### Administrative Queries
+Admins bypass RLS using service role key for moderation actions.

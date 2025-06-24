@@ -1,0 +1,474 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Blob animations for welcome page */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Add xs breakpoint for extra small screens */
+@screen xs {
+  /* Extra small screen styles */
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Spacely specific styles */
+.spacely-btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 rounded-lg font-medium transition-colors duration-200;
+}
+
+.spacely-btn-primary:hover {
+  @apply bg-blue-700;
+}
+
+.spacely-text-primary {
+  @apply text-gray-900;
+}
+
+.spacely-text-muted {
+  @apply text-gray-600;
+}
+
+/* Responsive listing card styles */
+.listing-card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer;
+  @apply h-full flex flex-col; /* Ensure consistent height */
+}
+
+.listing-photo-container {
+  @apply w-full overflow-hidden relative;
+  height: 140px; /* Fixed height for mobile */
+}
+
+@media (min-width: 640px) {
+  .listing-photo-container {
+    height: 180px; /* Larger for tablet+ */
+  }
+}
+
+@media (min-width: 1024px) {
+  .listing-photo-container {
+    height: 200px; /* Even larger for desktop */
+  }
+}
+
+.listing-photo {
+  @apply w-full h-full object-cover transition-transform duration-300 hover:scale-105;
+}
+
+.listing-content {
+  @apply p-3 sm:p-4 flex-1 flex flex-col justify-between;
+}
+
+.listing-title {
+  @apply text-sm sm:text-base lg:text-lg font-semibold text-gray-900 line-clamp-2 leading-tight;
+}
+
+.listing-price {
+  @apply text-lg sm:text-xl font-bold text-blue-600 mb-2;
+}
+
+.listing-location {
+  @apply flex items-center text-gray-600 text-xs sm:text-sm mb-2;
+  @apply gap-1;
+}
+
+.listing-type {
+  @apply inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full mb-2 sm:mb-3;
+}
+
+.listing-amenities {
+  @apply flex flex-wrap gap-1 mb-2 sm:mb-3;
+}
+
+.amenity-tag {
+  @apply px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full;
+}
+
+.listing-meta {
+  @apply flex justify-between items-center text-gray-500 mt-auto;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom responsive utilities */
+@responsive {
+  .xs\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* DWELLY Component Styles - Clean & Modern */
+.dwelly-card {
+  @apply bg-white rounded-xl overflow-hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.dwelly-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.dwelly-btn {
+  @apply inline-block px-4 py-2 rounded-lg font-medium transition-all duration-200 text-center cursor-pointer;
+}
+
+.dwelly-btn-primary {
+  background-color: var(--dwelly-secondary);
+  @apply text-white shadow-sm;
+  border: none;
+}
+
+.dwelly-btn-primary:hover {
+  background-color: #2980b9;
+  @apply shadow-md;
+}
+
+.dwelly-text-primary {
+  color: var(--dwelly-primary);
+}
+
+.dwelly-text-secondary {
+  color: var(--dwelly-secondary);
+}
+
+.dwelly-text-success {
+  color: var(--dwelly-success);
+}
+
+.dwelly-text-muted {
+  color: var(--dwelly-gray);
+}
+
+/* Modern Listing Styles - No Side Gaps */
+.listing-card:hover {
+  @apply dwelly-card;
+}
+
+.listing-card:hover .listing-photo {
+  transform: scale(1.05);
+}
+
+.listing-title {
+  @apply text-base sm:text-lg font-semibold mb-3;
+  color: var(--dwelly-primary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.listing-price {
+  @apply text-lg sm:text-xl font-bold mb-3;
+  color: var(--dwelly-success);
+}
+
+.listing-location {
+  @apply text-sm mb-4 flex items-center gap-2;
+  color: var(--dwelly-gray);
+}
+
+.listing-type {
+  @apply inline-block px-3 py-1.5 rounded-full text-xs font-medium mb-3;
+  background: linear-gradient(45deg, #e1f0ff, #f0f8ff);
+  color: var(--dwelly-secondary);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.listing-amenities {
+  @apply flex flex-wrap gap-1.5 mb-4;
+  max-height: 50px;
+  overflow: hidden;
+}
+
+.amenity-tag {
+  @apply inline-block px-2.5 py-1 rounded-full text-xs font-medium;
+  background: #f8f9fa;
+  color: var(--dwelly-gray);
+  border: 1px solid #e9ecef;
+}
+
+.listing-meta {
+  @apply flex justify-between items-center mt-auto pt-4 border-t border-gray-100;
+}
+
+/* Remove shiny gradients and maintain clean design */
+.star-rating {
+  @apply flex items-center gap-1;
+}
+
+.star-filled {
+  @apply text-yellow-400;
+}
+
+.star-empty {
+  @apply text-gray-300;
+}
+
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-error {
+  @apply bg-red-100 text-red-800;
+}
+
+.badge-info {
+  @apply bg-blue-100 text-blue-800;
+}
+
+/* Form styles */
+.form-group {
+  @apply space-y-2;
+}
+
+.form-label {
+  @apply text-sm font-medium;
+  color: var(--dwelly-primary);
+}
+
+.form-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
+
+.form-error {
+  @apply text-sm text-red-600;
+}
+
+/* Button variants - clean style */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200;
+}
+
+.btn-primary {
+  background-color: var(--dwelly-secondary);
+  @apply text-white;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-700 border-gray-300;
+}
+
+.btn-secondary:hover {
+  @apply bg-gray-200;
+}
+
+/* Image carousel styles */
+.carousel-container {
+  @apply relative overflow-hidden rounded-lg;
+}
+
+.carousel-slide {
+  @apply transition-transform duration-300 ease-in-out;
+}
+
+/* Loading skeletons */
+.skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
+}
+
+.skeleton-text {
+  @apply h-4 bg-gray-200 rounded;
+}
+
+.skeleton-avatar {
+  @apply h-10 w-10 bg-gray-200 rounded-full;
+}
+
+/* Responsive image containers */
+.aspect-square {
+  @apply aspect-[1/1];
+}
+
+.aspect-video {
+  @apply aspect-[16/9];
+}
+
+/* Map styles */
+.map-container {
+  @apply w-full h-64 rounded-lg overflow-hidden;
+}
+
+/* Utility classes */
+.text-truncate {
+  @apply truncate;
+}
+
+/* Mobile responsive utilities */
+@media (max-width: 640px) {
+  .mobile-hidden {
+    display: none;
+  }
+  
+  .mobile-full {
+    width: 100% !important;
+  }
+  
+  .mobile-text-sm {
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .print-hidden {
+    display: none !important;
+  }
+}
+
+/* Animation styles for auth page transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Smooth sliding transition */
+.smooth-slide {
+  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Map Search Box */
+.map-search-box {
+  margin: 10px;
+  padding: 8px 12px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.map-search-box:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* Map performance optimizations */
+/* Fixed infinite re-render issues by using useMemo for listings and removing callback dependencies */
+.map-container-stable {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* Ensures stable dimensions to prevent re-renders */
+}

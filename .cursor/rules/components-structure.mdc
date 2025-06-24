@@ -1,0 +1,51 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Components Structure
+
+SPACELY follows a modular component architecture with clear separation of concerns.
+
+## Component Organization
+
+### UI Components
+Base reusable components using shadcn/ui conventions:
+- **Alert**: [components/ui/alert.tsx](mdc:components/ui/alert.tsx) - Status messages
+- **Badge**: [components/ui/badge.tsx](mdc:components/ui/badge.tsx) - Labels and tags
+- **Button**: [components/ui/button.tsx](mdc:components/ui/button.tsx) - Interactive buttons
+- **Card**: [components/ui/card.tsx](mdc:components/ui/card.tsx) - Content containers
+- **Input**: [components/ui/input.tsx](mdc:components/ui/input.tsx) - Form inputs
+- **Select**: [components/ui/select.tsx](mdc:components/ui/select.tsx) - Dropdown selects
+
+### Navigation Components
+- **Navbar**: [components/navigation/navbar.tsx](mdc:components/navigation/navbar.tsx) - Main navigation with responsive menu
+- **Footer**: [components/navigation/footer.tsx](mdc:components/navigation/footer.tsx) - Site footer
+
+### Listings Components
+- **Listings Grid**: [components/listings/listings-grid.tsx](mdc:components/listings/listings-grid.tsx) - Main listings display
+- **Listings Header**: [components/listings/listings-header.tsx](mdc:components/listings/listings-header.tsx) - Page header with search
+- **Listings Filters**: [components/listings/listings-filters.tsx](mdc:components/listings/listings-filters.tsx) - Filter controls
+- **Search Section**: [components/listings/search-section.tsx](mdc:components/listings/search-section.tsx) - Search functionality
+- **Map Extractor**: [components/listings/map-extractor.tsx](mdc:components/listings/map-extractor.tsx) - Extract location from URLs
+- **Map View**: [components/listings/map-view.tsx](mdc:components/listings/map-view.tsx) - Interactive Google Maps component
+
+### Provider Components
+- **Auth Provider**: [components/providers/auth-provider.tsx](mdc:components/providers/auth-provider.tsx) - Authentication context
+- **Theme Provider**: [components/providers/theme-provider.tsx](mdc:components/providers/theme-provider.tsx) - Theme context
+
+## Design System
+
+- **Styling**: Uses Tailwind CSS with custom SPACELY branding
+- **Icons**: Lucide React icons throughout the application  
+- **Color Scheme**: Blue primary (#2563eb) with SPACELY-specific classes
+- **Responsive**: Mobile-first design with responsive breakpoints
+- **Typography**: Consistent text scaling and spacing
+
+## Component Patterns
+
+- All components are TypeScript with proper interfaces
+- Form components use React Hook Form with Zod validation
+- Async operations use proper loading states and error handling
+- Components follow the "container/presentational" pattern where applicable
+- Reusable UI components are kept generic and styled via props

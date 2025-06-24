@@ -1,0 +1,16 @@
+{
+  "name": "SPACELY",
+  "short_name": "SPACELY",
+  "description": "Find Your Perfect Campus Home at Mapua Malayan Colleges Mindanao",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/images/placeholder-property.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+} 

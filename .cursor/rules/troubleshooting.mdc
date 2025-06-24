@@ -1,0 +1,126 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Troubleshooting Guide
+
+Common issues and solutions for SPACELY development and deployment.
+
+## Database Issues
+
+### RLS Policy Violations
+**Error**: "new row violates row-level security policy"
+**Cause**: Row Level Security policies blocking legitimate operations
+**Solutions**:
+- Run [scripts/fix-posts-rls.js](mdc:scripts/fix-posts-rls.js) to update policies
+- Use service role key for admin operations in API routes
+- Check user authentication context in server-side operations
+
+### Foreign Key Ambiguity
+**Error**: "There are multiple foreign key relationships"
+**Cause**: Multiple relationships between tables (e.g., posts ↔ users)
+**Solution**: Use explicit foreign key names in queries:
+```typescript
+.select(`*, users!posts_user_id_fkey (full_name)`)
+```
+
+### No Rows Returned
+**Error**: "JSON object requested, multiple (or no) rows returned"
+**Cause**: Expecting single result but getting 0 or multiple rows
+**Solutions**:
+- Check approval status: only `approved` listings show on main page
+- Verify RLS policies allow user to access the data
+- Use [scripts/debug-listings.js](mdc:scripts/debug-listings.js) to inspect data
+
+## Authentication Issues
+
+### Auto-login Problems
+**Issue**: Users auto-logging in as previous user
+**Cause**: Cached authentication state
+**Solution**: Clear browser localStorage and session storage, restart dev server
+
+### Admin Access Denied
+**Issue**: Cannot access admin dashboard
+**Solutions**:
+- Run [scripts/make-admin.js](mdc:scripts/make-admin.js) with user email
+- Check user role in database (`role: 'admin'`)
+- Verify middleware authentication in [middleware.ts](mdc:middleware.ts)
+
+## Google Maps Issues
+
+### Maps Not Loading
+**Error**: "This page can't load Google Maps correctly"
+**Cause**: Missing or invalid Google Maps API key
+**Solutions**:
+- Add `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` to `.env.local`
+- Enable "Maps JavaScript API" and "Places API" in Google Cloud Console
+- Check API key restrictions and quotas
+
+### Location Extraction Fails
+**Issue**: Map URLs not extracting coordinates
+**Cause**: Unsupported URL format or API limits
+**Solutions**:
+- Verify URL format in [app/api/extract-location/route.ts](mdc:app/api/extract-location/route.ts)
+- Check Google Maps API quotas and billing
+- Use direct coordinate input as fallback
+
+## Form Validation Issues
+
+### Enum Value Errors
+**Error**: "invalid enum value" for room_type
+**Cause**: Using incorrect enum values
+**Solution**: Use correct furnishing values: `bare`, `semi_furnished`, `furnished`
+
+### Email Validation Fails
+**Issue**: Valid MCM emails rejected
+**Cause**: Case sensitivity or domain validation
+**Solution**: Check validation in [lib/validations.ts](mdc:lib/validations.ts) - should accept @mcm.edu.ph (case-insensitive)
+
+## Environment Issues
+
+### Missing Environment Variables
+**Error**: Supabase connection failures
+**Cause**: Missing or incorrect environment variables
+**Solutions**:
+- Verify all required variables in `.env.local`
+- Check variable names match exactly (case-sensitive)
+- Restart development server after changes
+
+### Port Conflicts
+**Issue**: Application won't start on port 5000
+**Cause**: Port already in use
+**Solutions**:
+- Kill existing processes: `npx kill-port 5000`
+- Use different port: `npm run dev -- -p 3000`
+- Check for other Next.js instances running
+
+## Performance Issues
+
+### Slow Query Performance
+**Issue**: Listings page loads slowly
+**Causes**: Missing indexes, complex joins, large datasets
+**Solutions**:
+- Add database indexes for frequently queried columns
+- Implement pagination for large result sets
+- Optimize Supabase queries with select specific columns
+
+### Image Loading Issues
+**Issue**: Listing photos not displaying
+**Causes**: Incorrect Supabase storage URLs, missing permissions
+**Solutions**:
+- Check storage bucket policies in Supabase
+- Verify image URLs are accessible
+- Add storage domain to Next.js image configuration
+
+## Development Tools
+
+### Debug Scripts
+- **Check Listings**: [scripts/debug-listings.js](mdc:scripts/debug-listings.js)
+- **Make Admin**: [scripts/make-admin.js](mdc:scripts/make-admin.js)
+- **Approve Listing**: [scripts/approve-listing.js](mdc:scripts/approve-listing.js)
+
+### Database Access
+- **Supabase Dashboard**: Direct SQL queries and table management
+- **Local Client**: Use Supabase CLI for local development
+- **API Testing**: Test endpoints with tools like Postman or curl

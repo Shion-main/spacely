@@ -1,0 +1,72 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Admin Features & Moderation
+
+SPACELY includes comprehensive admin tools for content moderation, user management, and platform oversight.
+
+## Admin Dashboard
+
+### Main Dashboard
+[app/admin/dashboard/page.tsx](mdc:app/admin/dashboard/page.tsx) provides:
+- **Statistics Overview**: Users, listings, reports counts
+- **Pending Listings**: Quick approval/rejection interface
+- **Recent Activity**: New users and listings this month
+- **Status Breakdown**: Approved, pending, rejected content counts
+
+### Access Control
+- **Role-based**: Only users with `role: 'admin'` can access admin routes
+- **Route Protection**: Middleware redirects non-admins to home page
+- **Auth Check**: Server-side verification of admin privileges
+
+## Content Moderation
+
+### Listing Approval
+[app/admin/pending-listings/page.tsx](mdc:app/admin/pending-listings/page.tsx):
+- **Approval Queue**: All pending listings with photo previews
+- **Quick Actions**: One-click approve/reject buttons
+- **Batch Operations**: Handle multiple listings efficiently
+- **Author Information**: Full user details for context
+
+### User Management
+[app/admin/users/page.tsx](mdc:app/admin/users/page.tsx):
+- **User Directory**: Searchable list of all registered users
+- **Role Management**: Promote users to admin status
+- **Account Actions**: Ban/unban problematic users
+- **Filter Options**: By role, status, or search terms
+
+### Content Reports
+[app/admin/reports/page.tsx](mdc:app/admin/reports/page.tsx):
+- **Report Categories**: Inappropriate content, spam, fraud, harassment
+- **Resolution Workflow**: Review → Resolve/Dismiss → Archive
+- **Admin Notes**: Document decisions for audit trail
+- **Status Tracking**: Pending, reviewed, resolved, dismissed
+
+## API Integration
+
+### Admin API Routes
+- **Stats**: [app/api/admin/stats/route.ts](mdc:app/api/admin/stats/route.ts) - Dashboard metrics
+- **Listing Actions**: [app/api/admin/listings/[id]/route.ts](mdc:app/api/admin/listings/[id]/route.ts) - Approve/reject
+- **User Actions**: [app/api/admin/users/[id]/route.ts](mdc:app/api/admin/users/[id]/route.ts) - Ban/unban
+- **Report Actions**: [app/api/admin/reports/[id]/route.ts](mdc:app/api/admin/reports/[id]/route.ts) - Moderate reports
+
+### Database Permissions
+- **RLS Bypass**: Admin operations use service role for elevated permissions
+- **Audit Trail**: Track admin actions with timestamps and reasoning
+- **Data Integrity**: Maintain referential integrity during moderation actions
+
+## Utility Scripts
+
+### Management Scripts
+Located in [scripts/](mdc:scripts/):
+- **Make Admin**: [scripts/make-admin.js](mdc:scripts/make-admin.js) - Promote user to admin
+- **Debug Listings**: [scripts/debug-listings.js](mdc:scripts/debug-listings.js) - Check listing statuses
+- **Approve Listing**: [scripts/approve-listing.js](mdc:scripts/approve-listing.js) - Direct approval via CLI
+
+### Common Admin Tasks
+- **User Role Updates**: Change user permissions
+- **Bulk Approvals**: Handle multiple pending items
+- **Data Cleanup**: Remove spam or inappropriate content
+- **System Monitoring**: Track platform health and usage

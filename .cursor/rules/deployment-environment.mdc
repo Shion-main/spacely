@@ -1,0 +1,94 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Deployment & Environment Configuration
+
+SPACELY requires specific environment setup and follows deployment best practices for Next.js and Supabase.
+
+## Environment Variables
+
+### Required Variables
+Must be set in `.env.local` (not tracked in git):
+
+```bash
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key  # Optional, for admin operations
+
+# Google Maps Integration
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+
+# Application Settings
+NEXT_PUBLIC_APP_URL=http://localhost:5000  # Or production URL
+```
+
+### API Key Requirements
+- **Google Maps API**: Enable "Maps JavaScript API" and "Places API"
+- **Supabase Keys**: Project-specific, get from Supabase dashboard
+- **Domain Restrictions**: Restrict API keys to your domains for security
+
+## Database Setup
+
+### Schema Initialization
+Database schema is defined in [supabase/schema.sql](mdc:supabase/schema.sql):
+- **Core Tables**: Users, posts, rooms, room_types, etc.
+- **RLS Policies**: Row-level security for multi-tenant access
+- **Indexes**: Optimized queries for location and text search
+- **Enums**: Predefined values for room_type, approval_status, etc.
+
+### Migration Scripts
+Located in [scripts/](mdc:scripts/):
+- **Database Setup**: [scripts/setup-database.js](mdc:scripts/setup-database.js) - Initial schema
+- **RLS Fixes**: [scripts/fix-posts-rls.js](mdc:scripts/fix-posts-rls.js) - Permission adjustments
+
+## Application Configuration
+
+### Next.js Configuration
+[next.config.js](mdc:next.config.js):
+- **Image Optimization**: Supabase storage domain whitelist
+- **API Routes**: Server-side rendering configuration
+- **Build Settings**: Production optimization
+
+### Tailwind Configuration
+[tailwind.config.js](mdc:tailwind.config.js):
+- **Custom Breakpoints**: Responsive design breakpoints including `xs: '475px'`
+- **Color Palette**: SPACELY brand colors and themes
+- **Component Variants**: Extended Tailwind utilities
+
+### TypeScript Configuration
+[tsconfig.json](mdc:tsconfig.json):
+- **Path Aliases**: `@/` for clean imports
+- **Strict Mode**: Type safety enforcement
+- **Next.js Integration**: Optimized for Next.js 14
+
+## Development Workflow
+
+### Local Development
+1. **Clone Repository**: Git clone with environment setup
+2. **Install Dependencies**: `npm install` for all packages
+3. **Environment Setup**: Configure `.env.local` with required keys
+4. **Database Connection**: Link to Supabase project
+5. **Development Server**: `npm run dev` on port 5000
+
+### Build Process
+- **Type Checking**: TypeScript compilation
+- **Linting**: ESLint validation
+- **Build Optimization**: Next.js production build
+- **Static Generation**: Pre-rendered pages where possible
+
+## Deployment Considerations
+
+### Production Requirements
+- **Environment Variables**: Set all required variables in hosting platform
+- **Database Policies**: Ensure RLS policies are properly configured
+- **API Rate Limits**: Configure appropriate limits for production usage
+- **CDN Setup**: Static asset optimization
+
+### Security Checklist
+- **API Key Restrictions**: Domain-restricted keys only
+- **HTTPS Only**: Secure connections in production
+- **RLS Validation**: Test database security policies
+- **Input Sanitization**: Server-side content validation

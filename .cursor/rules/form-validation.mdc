@@ -1,0 +1,74 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Form Validation & Requirements
+
+SPACELY uses Zod schemas for consistent validation across client and server with strict institutional requirements.
+
+## Validation Schemas
+
+### Core Schemas
+All validation schemas are defined in [lib/validations.ts](mdc:lib/validations.ts):
+
+### User Registration
+- **Email**: Must be `@mcm.edu.ph` domain (case-insensitive)
+- **Student ID**: Exactly 10 digits (numbers only)
+- **Phone**: Format `+63XXXXXXXXXX` with auto-formatting
+- **Password**: 8-128 chars, must include:
+  - Lowercase letter (a-z)
+  - Uppercase letter (A-Z)  
+  - Number (0-9)
+  - Special character (@$!%*?&)
+  - No spaces allowed
+- **Department/Course**: Union type handling both string and number IDs
+
+### Listing Creation
+- **Rental Type**: Required selection from `room_types` table
+- **Location**: City, barangay, street (all required)
+- **Price**: Positive number (monthly rent)
+- **Contact Info**: Landlord name, contact number, social link (URL)
+- **Room Details**: 
+  - Number of rooms (min 1)
+  - Bathroom type: `common` or `own`
+  - Furnishing: `bare`, `semi_furnished`, `furnished`
+- **Amenities**: Boolean flags for Wi-Fi, CCTV, parking
+- **Optional**: Building name, unit number, page link, maps link
+
+### Location Extraction
+- **Maps URL**: Valid Google Maps or Apple Maps URL format
+- **Coordinates**: Optional lat/lng extracted from URLs
+
+## Form Patterns
+
+### React Hook Form Integration
+```typescript
+const form = useForm<FormData>({
+  resolver: zodResolver(validationSchema),
+  defaultValues: { /* ... */ }
+})
+```
+
+### Error Handling
+- **Client-side**: Real-time validation with error messages
+- **Server-side**: Additional validation in API routes
+- **User Feedback**: Toast notifications for success/error states
+
+### Auto-formatting
+- **Phone Numbers**: Automatically prepends `+63` to 10-digit entries
+- **Student IDs**: Number-only validation with exact length
+- **URLs**: Validates social links and map URLs
+
+## Special Requirements
+
+### Institutional Constraints
+- **Email Domain**: Only Mapua Malayan Colleges Mindanao students (@mcm.edu.ph)
+- **Academic Data**: Department and course selection from predefined lists
+- **Contact Validation**: Ensures legitimate contact information
+
+### Content Moderation
+Forms include built-in protection against:
+- Invalid contact information
+- Inappropriate content (server-side sanitization)
+- Spam/duplicate submissions (rate limiting)
