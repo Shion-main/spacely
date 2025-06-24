@@ -188,7 +188,7 @@ export function ListingsGrid({ listings, currentPage, totalPages, totalCount, se
 
                 {/* Property Type Badge */}
                 <Badge className="absolute top-3 left-3 bg-blue-600/90 backdrop-blur-sm text-white shadow-md">
-                  {listing.room_types?.display_name || 'Unknown Type'}
+                  {listing.room_types.display_name}
                 </Badge>
 
                 {/* Photos Count */}
@@ -203,7 +203,7 @@ export function ListingsGrid({ listings, currentPage, totalPages, totalCount, se
                 {/* Property Type Title */}
                 <div className="mb-3">
                   <h3 className="font-semibold text-lg text-gray-900 mb-1 group-hover:text-blue-600 transition-colors duration-200">
-                    {listing.room_types?.display_name || 'Unknown Type'}
+                    {listing.room_types.display_name}
                   </h3>
                   
                   {/* Location */}
@@ -242,15 +242,15 @@ export function ListingsGrid({ listings, currentPage, totalPages, totalCount, se
                 {/* Amenities */}
                 {allAmenities.length > 0 && (
                   <div className="mb-4">
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {allAmenities.map((amenity, index) => (
-                        <Badge 
-                          key={index} 
-                          variant="outline" 
-                          className="text-xs bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 transition-colors duration-200"
+                        <div
+                          key={index}
+                          className="flex items-center space-x-2 bg-blue-50 rounded-lg px-3 py-2 text-[11px] sm:text-xs font-medium text-gray-900"
                         >
-                          {amenity}
-                        </Badge>
+                          <span className="w-2 h-2 bg-blue-500 rounded-full" />
+                          <span className="truncate">{amenity}</span>
+                        </div>
                       ))}
                     </div>
                   </div>
