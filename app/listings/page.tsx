@@ -17,7 +17,7 @@ interface ListingsPageProps {
 export default async function ListingsPage({ searchParams }: ListingsPageProps) {
   const supabase = createClient()
   const headersList = headers()
-  const host = headersList.get('host') || 'localhost:3000'
+  const host = headersList.get('host') || 'localhost:5000'
   const protocol = headersList.get('x-forwarded-proto') || 'http'
   const baseUrl = `${protocol}://${host}`
 
