@@ -60,12 +60,12 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
         ),
         rooms!inner(
           number_of_rooms,
-          bathroom_type,
-          room_types!inner(
-            type_name,
-            display_name
-          )
+          bathroom_type
         ),
+        room_types:rooms!inner(room_types!inner(
+          type_name,
+          display_name
+        )),
         photos(
           file_path,
           storage_path,
