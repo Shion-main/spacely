@@ -30,48 +30,41 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
 
   const pageSize = 12
 
-  // Build API URL with search parameters
-  const apiUrl = new URL(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5000'}/api/listings`)
-  apiUrl.searchParams.set('page', page.toString())
-  apiUrl.searchParams.set('limit', pageSize.toString())
-  
-  if (search) apiUrl.searchParams.set('search', search)
-  if (city) apiUrl.searchParams.set('city', city)
-  if (roomType) apiUrl.searchParams.set('type_id', roomType)
-  if (priceMin !== undefined) apiUrl.searchParams.set('min_price', priceMin.toString())
-  if (priceMax !== undefined) apiUrl.searchParams.set('max_price', priceMax.toString())
+  // Fetch listings via relative API route
+  const params = new URLSearchParams()
+  params.set('page', page.toString())
+  params.set('limit', pageSize.toString())
+  if (search) params.set('search', search)
+  if (city) params.set('city', city)
+  if (roomType) params.set('type_id', roomType)
+  if (priceMin !== undefined) params.set('min_price', priceMin.toString())
+  if (priceMax !== undefined) params.set('max_price', priceMax.toString())
 
-  // Fetch data from our API endpoint (which has the RLS bypass fix)
   let listings: any[] = []
   let totalCount = 0
-  
   try {
-    const response = await fetch(apiUrl.toString(), {
-      headers: {
-        'Cache-Control': 'no-cache'
-      }
+    const listResponse = await fetch(`/api/listings?${params.toString()}`, {
+      headers: { 'Cache-Control': 'no-cache' }
     })
-    
-    if (response.ok) {
-      const data = await response.json()
+    if (listResponse.ok) {
+      const data = await listResponse.json()
       listings = data.listings || []
-      
-      // Get total count by making a separate query without pagination
-      const countUrl = new URL(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5000'}/api/listings`)
-      if (search) countUrl.searchParams.set('search', search)
-      if (city) countUrl.searchParams.set('city', city)
-      if (roomType) countUrl.searchParams.set('type_id', roomType)
-      if (priceMin !== undefined) countUrl.searchParams.set('min_price', priceMin.toString())
-      if (priceMax !== undefined) countUrl.searchParams.set('max_price', priceMax.toString())
-      countUrl.searchParams.set('limit', '1000') // Large number to get all results for counting
-      
-      const countResponse = await fetch(countUrl.toString())
+
+      // Count total results without pagination
+      const countParams = new URLSearchParams()
+      if (search) countParams.set('search', search)
+      if (city) countParams.set('city', city)
+      if (roomType) countParams.set('type_id', roomType)
+      if (priceMin !== undefined) countParams.set('min_price', priceMin.toString())
+      if (priceMax !== undefined) countParams.set('max_price', priceMax.toString())
+      countParams.set('limit', '1000')
+      const countResponse = await fetch(`/api/listings?${countParams.toString()}`)
       if (countResponse.ok) {
         const countData = await countResponse.json()
         totalCount = countData.listings?.length || 0
       }
     } else {
-      console.error('Failed to fetch listings from API:', response.status, response.statusText)
+      console.error('Failed to fetch listings from API:', listResponse.status, listResponse.statusText)
     }
   } catch (error) {
     console.error('Error fetching listings from API:', error)
