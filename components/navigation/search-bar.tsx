@@ -7,6 +7,7 @@ import { Search, Filter } from 'lucide-react'
 import { SearchFilters } from './search-filters'
 
 interface RoomType {
+  type_id: number
   type_name: string
   display_name: string
 }
@@ -67,7 +68,8 @@ export function SearchBar({ roomTypes = [] }: SearchBarProps) {
   }, [])
 
   // Check if filters are active
-  const hasActiveFilters = searchParams.get('city') || searchParams.get('room_type') || 
+  const hasActiveFilters = searchParams.get('barangay') || searchParams.get('type_id') || searchParams.get('room_type') || 
+                          searchParams.get('min_price') || searchParams.get('max_price') || 
                           searchParams.get('price_min') || searchParams.get('price_max')
 
   // Don't render until mounted to avoid hydration issues

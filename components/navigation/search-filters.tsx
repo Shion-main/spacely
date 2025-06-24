@@ -6,8 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Filter, X } from 'lucide-react'
+import { Combobox } from '@/components/ui/combobox'
+import { DAVAO_BARANGAYS } from '@/lib/davao-barangays'
 
 interface RoomType {
+  type_id: number
   type_name: string
   display_name: string
 }
@@ -22,25 +25,40 @@ export function SearchFilters({ roomTypes = [], isOpen, onClose }: SearchFilters
   const router = useRouter()
   const searchParams = useSearchParams()
   
-  const [city, setCity] = useState(searchParams.get('city') || '')
-  const [roomType, setRoomType] = useState(searchParams.get('room_type') || '')
-  const [priceMin, setPriceMin] = useState(searchParams.get('price_min') || '')
-  const [priceMax, setPriceMax] = useState(searchParams.get('price_max') || '')
+  const [barangay, setBarangay] = useState(searchParams.get('barangay') || '')
+  const [roomType, setRoomType] = useState(searchParams.get('type_id') || '')
+  const [priceMin, setPriceMin] = useState(searchParams.get('min_price') || searchParams.get('price_min') || '')
+  const [priceMax, setPriceMax] = useState(searchParams.get('max_price') || searchParams.get('price_max') || '')
+
+  const PRICE_OPTIONS = [
+    { label: 'No minimum', value: '' },
+    { label: '₱1,000', value: '1000' },
+    { label: '₱5,000', value: '5000' },
+    { label: '₱10,000', value: '10000' },
+    { label: '₱20,000', value: '20000' },
+    { label: '₱30,000', value: '30000' }
+  ]
 
   const handleApplyFilters = () => {
     const params = new URLSearchParams(searchParams.toString())
     
-    if (city) params.set('city', city)
-    else params.delete('city')
+    if (barangay) params.set('barangay', barangay)
+    else params.delete('barangay')
     
-    if (roomType) params.set('room_type', roomType)
-    else params.delete('room_type')
+    if (roomType) params.set('type_id', roomType)
+    else params.delete('type_id')
     
-    if (priceMin) params.set('price_min', priceMin)
-    else params.delete('price_min')
+    if (priceMin) params.set('min_price', priceMin)
+    else params.delete('min_price')
     
-    if (priceMax) params.set('price_max', priceMax)
-    else params.delete('price_max')
+    if (priceMax) params.set('max_price', priceMax)
+    else params.delete('max_price')
+    
+    // Clean up old parameter names for backward compatibility
+    params.delete('city')
+    params.delete('room_type')
+    params.delete('price_min')
+    params.delete('price_max')
     
     // Reset to first page when applying filters
     params.delete('page')
@@ -50,7 +68,7 @@ export function SearchFilters({ roomTypes = [], isOpen, onClose }: SearchFilters
   }
 
   const clearFilters = () => {
-    setCity('')
+    setBarangay('')
     setRoomType('')
     setPriceMin('')
     setPriceMax('')
@@ -66,7 +84,7 @@ export function SearchFilters({ roomTypes = [], isOpen, onClose }: SearchFilters
     onClose()
   }
 
-  const hasActiveFilters = city || roomType || priceMin || priceMax
+  const hasActiveFilters = barangay || roomType || priceMin || priceMax
 
   if (!isOpen) return null
 
@@ -87,15 +105,18 @@ export function SearchFilters({ roomTypes = [], isOpen, onClose }: SearchFilters
           </div>
 
           <div className="space-y-4">
-            {/* City */}
+            {/* Barangay */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                City
+                Barangay
               </label>
-              <Input
-                placeholder="Enter city"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
+              <Combobox
+                options={DAVAO_BARANGAYS.map(b => ({ label: b, value: b }))}
+                value={barangay}
+                onChange={setBarangay}
+                placeholder="Search and select a barangay..."
+                searchPlaceholder="Search barangay..."
+                emptyPlaceholder="No barangay found."
               />
             </div>
 
@@ -111,7 +132,7 @@ export function SearchFilters({ roomTypes = [], isOpen, onClose }: SearchFilters
               >
                 <option value="">All types</option>
                 {roomTypes.map((type) => (
-                  <option key={type.type_name} value={type.type_name}>
+                  <option key={type.type_id} value={type.type_id}>
                     {type.display_name}
                   </option>
                 ))}
@@ -124,23 +145,29 @@ export function SearchFilters({ roomTypes = [], isOpen, onClose }: SearchFilters
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Min Price (₱)
                 </label>
-                <Input
-                  type="number"
-                  placeholder="0"
+                <select
                   value={priceMin}
                   onChange={(e) => setPriceMin(e.target.value)}
-                />
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {PRICE_OPTIONS.map(opt => (
+                    <option key={opt.value || 'none'} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Max Price (₱)
                 </label>
-                <Input
-                  type="number"
-                  placeholder="No limit"
+                <select
                   value={priceMax}
                   onChange={(e) => setPriceMax(e.target.value)}
-                />
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {PRICE_OPTIONS.map(opt => (
+                    <option key={opt.value || 'none'} value={opt.value}>{opt.value === '' ? 'No limit' : opt.label}</option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>

@@ -98,7 +98,12 @@ export function ListingsFilters({ roomTypes, cities, amenities, initialFilters }
             params.set(key, value.join(','))
           }
         } else {
-          params.set(key, value as string)
+          // Map frontend parameter names to API parameter names
+          let paramName = key
+          if (key === 'type') paramName = 'type_id'
+          if (key === 'q') paramName = 'search'
+          
+          params.set(paramName, value as string)
         }
       }
     })
@@ -199,12 +204,12 @@ export function ListingsFilters({ roomTypes, cities, amenities, initialFilters }
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Select value={filters.type} onValueChange={(value) => handleFilterChange('type', value)}>
+          <Select value={filters.type || "all"} onValueChange={(value) => handleFilterChange('type', value === "all" ? "" : value)}>
             <SelectTrigger>
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               {roomTypes.map((type) => (
                 <SelectItem key={type.id} value={type.type_name}>
                   {type.display_name}
@@ -224,22 +229,6 @@ export function ListingsFilters({ roomTypes, cities, amenities, initialFilters }
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-            <Select value={filters.city} onValueChange={(value) => handleFilterChange('city', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Cities" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All Cities</SelectItem>
-                {cities.map((city) => (
-                  <SelectItem key={city} value={city}>
-                    {city}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Barangay</label>
             <Input
@@ -292,12 +281,12 @@ export function ListingsFilters({ roomTypes, cities, amenities, initialFilters }
         <CardContent className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Number of Rooms</label>
-            <Select value={filters.rooms} onValueChange={(value) => handleFilterChange('rooms', value)}>
+            <Select value={filters.rooms || "any"} onValueChange={(value) => handleFilterChange('rooms', value === "any" ? "" : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Any" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any</SelectItem>
+                <SelectItem value="any">Any</SelectItem>
                 {[1, 2, 3, 4, 5, 6].map((num) => (
                   <SelectItem key={num} value={num.toString()}>
                     {num} room{num > 1 ? 's' : ''}
@@ -308,12 +297,12 @@ export function ListingsFilters({ roomTypes, cities, amenities, initialFilters }
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Bathroom Type</label>
-            <Select value={filters.bathroom} onValueChange={(value) => handleFilterChange('bathroom', value)}>
+            <Select value={filters.bathroom || "any"} onValueChange={(value) => handleFilterChange('bathroom', value === "any" ? "" : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Any" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any</SelectItem>
+                <SelectItem value="any">Any</SelectItem>
                 {BATHROOM_TYPES.map((type) => (
                   <SelectItem key={type.value} value={type.value}>
                     {type.label}

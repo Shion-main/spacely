@@ -285,6 +285,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '12')
     const city = searchParams.get('city')
+    const barangayFilter = searchParams.get('barangay')
     const type_id = searchParams.get('type_id')
     const min_price = searchParams.get('min_price')
     const max_price = searchParams.get('max_price')
@@ -309,8 +310,14 @@ export async function GET(request: NextRequest) {
     if (city) {
       query = query.ilike('city', `%${city}%`)
     }
+    if (barangayFilter) {
+      query = query.ilike('barangay', `%${barangayFilter}%`)
+    }
     if (type_id) {
-      query = query.eq('type_id', parseInt(type_id))
+      const parsedId = parseInt(type_id)
+      if (!Number.isNaN(parsedId)) {
+        query = query.eq('type_id', parsedId)
+      }
     }
     if (min_price) {
       query = query.gte('price', parseInt(min_price))

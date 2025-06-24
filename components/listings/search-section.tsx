@@ -27,20 +27,20 @@ export function SearchSection({ roomTypes, searchParams }: SearchSectionProps) {
   const currentSearchParams = useSearchParams()
   
   const [search, setSearch] = useState(searchParams.search || '')
-  const [city, setCity] = useState(searchParams.city || '')
-  const [roomType, setRoomType] = useState(searchParams.room_type || '')
-  const [priceMin, setPriceMin] = useState(searchParams.price_min || '')
-  const [priceMax, setPriceMax] = useState(searchParams.price_max || '')
+  const [barangay, setBarangay] = useState(searchParams.barangay || '')
+  const [roomType, setRoomType] = useState(searchParams.type_id || '')
+  const [priceMin, setPriceMin] = useState(searchParams.min_price || '')
+  const [priceMax, setPriceMax] = useState(searchParams.max_price || '')
   const [showFilters, setShowFilters] = useState(false)
 
   const handleSearch = () => {
     const params = new URLSearchParams()
     
     if (search) params.set('search', search)
-    if (city) params.set('city', city)
-    if (roomType) params.set('room_type', roomType)
-    if (priceMin) params.set('price_min', priceMin)
-    if (priceMax) params.set('price_max', priceMax)
+    if (barangay) params.set('barangay', barangay)
+    if (roomType) params.set('type_id', roomType)
+    if (priceMin) params.set('min_price', priceMin)
+    if (priceMax) params.set('max_price', priceMax)
     
     // Keep view if it exists
     const currentView = searchParams.view
@@ -51,7 +51,7 @@ export function SearchSection({ roomTypes, searchParams }: SearchSectionProps) {
 
   const clearFilters = () => {
     setSearch('')
-    setCity('')
+    setBarangay('')
     setRoomType('')
     setPriceMin('')
     setPriceMax('')
@@ -64,7 +64,7 @@ export function SearchSection({ roomTypes, searchParams }: SearchSectionProps) {
     router.push(`/listings?${params.toString()}`)
   }
 
-  const hasActiveFilters = search || city || roomType || priceMin || priceMax
+  const hasActiveFilters = search || barangay || roomType || priceMin || priceMax
 
   return (
     <Card className="mb-6">
@@ -109,15 +109,15 @@ export function SearchSection({ roomTypes, searchParams }: SearchSectionProps) {
         {showFilters && (
           <div className="border-t pt-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* City */}
+              {/* Barangay */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  City
+                  Barangay
                 </label>
                 <Input
-                  placeholder="Enter city"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Enter barangay"
+                  value={barangay}
+                  onChange={(e) => setBarangay(e.target.value)}
                 />
               </div>
 
@@ -132,8 +132,8 @@ export function SearchSection({ roomTypes, searchParams }: SearchSectionProps) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">All types</option>
-                  {roomTypes.map((type) => (
-                    <option key={type.type_name} value={type.type_name}>
+                  {roomTypes.map((type:any) => (
+                    <option key={type.id || type.type_name} value={type.id}>
                       {type.display_name}
                     </option>
                   ))}

@@ -21,11 +21,25 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
   const resolvedSearchParams = await searchParams
 
   // Get search parameters
-  const search = resolvedSearchParams.search || ''
+  const search = resolvedSearchParams.search || resolvedSearchParams.q || ''
   const city = resolvedSearchParams.city || ''
-  const roomType = resolvedSearchParams.room_type || ''
-  const priceMin = resolvedSearchParams.price_min ? Number(resolvedSearchParams.price_min) : undefined
-  const priceMax = resolvedSearchParams.price_max ? Number(resolvedSearchParams.price_max) : undefined
+  const barangay = resolvedSearchParams.barangay || ''
+
+  // Handle room type (string id) safely
+  const roomType = resolvedSearchParams.type_id || resolvedSearchParams.room_type || resolvedSearchParams.type || ''
+
+  // Price filters – convert to numbers and guard against NaN
+  const rawMinPrice = resolvedSearchParams.min_price ?? resolvedSearchParams.price_min
+  const rawMaxPrice = resolvedSearchParams.max_price ?? resolvedSearchParams.price_max
+
+  const priceMin = rawMinPrice !== undefined && rawMinPrice !== '' && !isNaN(Number(rawMinPrice))
+    ? Number(rawMinPrice)
+    : undefined
+
+  const priceMax = rawMaxPrice !== undefined && rawMaxPrice !== '' && !isNaN(Number(rawMaxPrice))
+    ? Number(rawMaxPrice)
+    : undefined
+
   const page = resolvedSearchParams.page ? Number(resolvedSearchParams.page) : 1
   const view = resolvedSearchParams.view || 'list' // 'list' or 'map'
 
@@ -43,6 +57,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
   
   if (search) apiUrl.searchParams.set('search', search)
   if (city) apiUrl.searchParams.set('city', city)
+  if (barangay) apiUrl.searchParams.set('barangay', barangay)
   if (roomType) apiUrl.searchParams.set('type_id', roomType)
   if (priceMin !== undefined) apiUrl.searchParams.set('min_price', priceMin.toString())
   if (priceMax !== undefined) apiUrl.searchParams.set('max_price', priceMax.toString())
@@ -66,6 +81,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
       const countUrl = new URL('/api/listings', baseUrl)
       if (search) countUrl.searchParams.set('search', search)
       if (city) countUrl.searchParams.set('city', city)
+      if (barangay) countUrl.searchParams.set('barangay', barangay)
       if (roomType) countUrl.searchParams.set('type_id', roomType)
       if (priceMin !== undefined) countUrl.searchParams.set('min_price', priceMin.toString())
       if (priceMax !== undefined) countUrl.searchParams.set('max_price', priceMax.toString())
@@ -88,7 +104,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
   // Get room types for filter
   const { data: roomTypes } = await supabase
     .from('room_types')
-    .select('type_name, display_name')
+    .select('type_id, type_name, display_name')
     .order('display_name')
 
   // Get user's favorites
