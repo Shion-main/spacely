@@ -1,21 +1,19 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { AdminAuthProvider, useAdminAuth } from '@/components/providers/admin-auth-provider'
 import { useAuth } from '@/components/providers/auth-provider'
 import { 
-  Shield, 
+  Menu,
   Home, 
   Clock, 
   Users, 
   Flag, 
-  Eye, 
   LogOut, 
-  TrendingUp,
-  BarChart3
+  TrendingUp
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
@@ -28,6 +26,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const { isAdmin, loading, signOut } = useAdminAuth()
   const { user } = useAuth() // Get user from main auth provider
   const pathname = usePathname()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Show loading state while checking authentication
   if (loading) {
@@ -76,7 +75,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 w-64 h-full bg-white border-r border-gray-200 z-40 flex flex-col">
+      <div className={`fixed top-0 left-0 w-64 h-full bg-white border-r border-gray-200 z-40 flex-col transform transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:flex`}>
         {/* Brand Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
@@ -126,14 +125,23 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         </div>
       </div>
 
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* Main Content Area */}
-      <div className="flex-1 ml-64">
+      <div className="flex-1 md:ml-64">
         {/* Top Header */}
         <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
+                  {/* Mobile menu button */}
+                  <button className="md:hidden mr-2" onClick={() => setSidebarOpen(true)}>
+                    <Menu className="w-6 h-6 text-gray-700" />
+                  </button>
                   <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
                     Admin Dashboard
                   </span>
