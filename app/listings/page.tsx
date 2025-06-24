@@ -77,7 +77,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
           amenity_name
         )
       `)
-      .eq('is_approved', true)
+      .eq('approval_status', 'approved')
       .eq('is_deleted', false)
       .eq('is_flagged', false)
 
