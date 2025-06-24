@@ -523,10 +523,14 @@ export default function ListingDetailsPage() {
                           {listing.amenities.map((amenity, index) => {
                             const IconComponent = amenityIcons[amenity] || Shield;
                             return (
-                              <div key={index} className="flex items-center p-3 bg-blue-50 rounded-lg">
-                                <IconComponent className="w-5 h-5 text-blue-500 mr-3" />
-                                <span>{amenity}</span>
-                              </div>
+                              <Badge 
+                                key={index}
+                                variant="outline"
+                                className="flex items-center gap-2 bg-blue-50 text-blue-600 border-blue-200 text-sm font-normal"
+                              >
+                                <span className="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+                                {amenity}
+                              </Badge>
                             );
                           })}
                         </div>
