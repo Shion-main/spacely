@@ -25,12 +25,10 @@ interface Listing {
     full_name: string
     phone_number: string
   }
-  room_types: Array<{
-    room_types: {
-      type_name: string
-      display_name: string
-    }
-  }>
+  room_types: {
+    type_name: string
+    display_name: string
+  }
   rooms: Array<{
     number_of_rooms: number
     bathroom_type: string
@@ -190,7 +188,7 @@ export function ListingsGrid({ listings, currentPage, totalPages, totalCount, se
 
                 {/* Property Type Badge */}
                 <Badge className="absolute top-3 left-3 bg-blue-600/90 backdrop-blur-sm text-white shadow-md">
-                  {listing.room_types[0]?.room_types?.display_name || 'Unknown Type'}
+                  {listing.room_types?.display_name || 'Unknown Type'}
                 </Badge>
 
                 {/* Photos Count */}
@@ -205,7 +203,7 @@ export function ListingsGrid({ listings, currentPage, totalPages, totalCount, se
                 {/* Property Type Title */}
                 <div className="mb-3">
                   <h3 className="font-semibold text-lg text-gray-900 mb-1 group-hover:text-blue-600 transition-colors duration-200">
-                    {listing.room_types[0]?.room_types?.display_name || 'Unknown Type'}
+                    {listing.room_types?.display_name || 'Unknown Type'}
                   </h3>
                   
                   {/* Location */}
