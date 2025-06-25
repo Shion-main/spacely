@@ -45,9 +45,46 @@ export default function AuthPage() {
     }
   }, [message, error])
 
+  // Prevent mobile viewport issues and form refreshes
+  useEffect(() => {
+    // Prevent zoom on input focus for mobile
+    const preventDefault = (e: Event) => {
+      if (e.target instanceof HTMLInputElement) {
+        // Ensure input has minimum font size to prevent zoom
+        const currentSize = window.getComputedStyle(e.target).fontSize
+        if (parseFloat(currentSize) < 16) {
+          e.target.style.fontSize = '16px'
+        }
+      }
+    }
+
+    // Add touchstart listener to prevent unwanted page refreshes
+    const preventRefresh = (e: TouchEvent) => {
+      // Don't prevent if it's a form submission or navigation button
+      const target = e.target as HTMLElement
+      if (target.closest('form') || target.closest('button[type="submit"]')) {
+        return
+      }
+    }
+
+    document.addEventListener('focusin', preventDefault)
+    document.addEventListener('touchstart', preventRefresh, { passive: true })
+
+    return () => {
+      document.removeEventListener('focusin', preventDefault)
+      document.removeEventListener('touchstart', preventRefresh)
+    }
+  }, [])
+
   // Handle mobile scroll blur effect
   useEffect(() => {
     const handleScroll = () => {
+      // Don't handle scroll if user is actively typing in forms
+      const activeElement = document.activeElement
+      if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+        return
+      }
+      
       const scrollContainer = document.querySelector('.mobile-scroll-container')
       const blurOverlay = document.querySelector('.mobile-blur-overlay')
       
@@ -63,7 +100,8 @@ export default function AuthPage() {
 
     const scrollContainer = document.querySelector('.mobile-scroll-container')
     if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', handleScroll)
+      // Use passive listener to improve performance and prevent interference
+      scrollContainer.addEventListener('scroll', handleScroll, { passive: true })
       return () => scrollContainer.removeEventListener('scroll', handleScroll)
     }
   }, [])
@@ -208,7 +246,7 @@ export default function AuthPage() {
         }
 
         toast.success('Successfully signed in!')
-        window.location.href = redirectTo
+        router.push(redirectTo)
         return // Redirect will happen, no need to toggle loading
       }
     } catch (error: any) {
@@ -246,9 +284,9 @@ export default function AuthPage() {
       console.log('Auth: Admin login successful:', result.user)
       toast.success(`Welcome back, ${result.user.name || 'Admin'}!`)
       
-      // Refresh the page to trigger AuthProvider to pick up the new session
-      console.log('Auth: Refreshing to establish session...')
-      window.location.href = '/admin/dashboard'
+      // Redirect to admin dashboard
+      console.log('Auth: Redirecting to admin dashboard...')
+      router.push('/admin/dashboard')
       
     } catch (error) {
       console.error('Auth: Login error:', error)
@@ -411,11 +449,17 @@ export default function AuthPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
-              <Input
-                type="email"
-                placeholder="your.name@mcm.edu.ph"
-                {...loginForm.register('email')}
-                className={`transition-all duration-200 ${loginForm.formState.errors.email ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+              <Controller
+                name="email"
+                control={loginForm.control}
+                render={({ field }) => (
+                  <Input
+                    type="email"
+                    placeholder="your.name@mcm.edu.ph"
+                    {...field}
+                    className={`transition-all duration-200 ${loginForm.formState.errors.email ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                  />
+                )}
               />
               {loginForm.formState.errors.email && (
                 <p className="text-sm text-red-600 mt-1 animate-fade-in">{loginForm.formState.errors.email.message}</p>
@@ -427,11 +471,17 @@ export default function AuthPage() {
                 Password
               </label>
               <div className="relative">
-                <Input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
-                  {...loginForm.register('password')}
-                  className={`pr-10 transition-all duration-200 ${loginForm.formState.errors.password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                <Controller
+                  name="password"
+                  control={loginForm.control}
+                  render={({ field }) => (
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Enter your password"
+                      {...field}
+                      className={`pr-10 transition-all duration-200 ${loginForm.formState.errors.password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                    />
+                  )}
                 />
                 <button
                   type="button"
@@ -486,11 +536,17 @@ export default function AuthPage() {
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Admin Email
         </label>
-        <Input
-          type="email"
-          placeholder="admin@example.com"
-          {...adminForm.register('email')}
-          className={`transition-all duration-200 ${adminForm.formState.errors.email ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+        <Controller
+          name="email"
+          control={adminForm.control}
+          render={({ field }) => (
+            <Input
+              type="email"
+              placeholder="admin@example.com"
+              {...field}
+              className={`transition-all duration-200 ${adminForm.formState.errors.email ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+            />
+          )}
         />
         {adminForm.formState.errors.email && (
           <p className="text-sm text-red-600 mt-1 animate-fade-in">{adminForm.formState.errors.email.message}</p>
@@ -502,11 +558,17 @@ export default function AuthPage() {
           Admin Password
         </label>
         <div className="relative">
-          <Input
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Enter admin password"
-            {...adminForm.register('password')}
-            className={`pr-10 transition-all duration-200 ${adminForm.formState.errors.password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+          <Controller
+            name="password"
+            control={adminForm.control}
+            render={({ field }) => (
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter admin password"
+                {...field}
+                className={`pr-10 transition-all duration-200 ${adminForm.formState.errors.password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+              />
+            )}
           />
           <button
             type="button"
