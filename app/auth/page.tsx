@@ -111,7 +111,6 @@ export default function AuthPage() {
   React.useEffect(() => {
     if (watchedDepartment && isRegisterMode) {
       // Reset course selection when department changes
-      const currentValues = registerForm.getValues()
       registerForm.setValue('course_id', undefined, { shouldDirty: false })
       
       const fetchCourses = async () => {
@@ -132,11 +131,11 @@ export default function AuthPage() {
       // Also reset course when no department is selected
       registerForm.setValue('course_id', undefined, { shouldDirty: false })
     }
-  }, [watchedDepartment, isRegisterMode, registerForm])
+  }, [watchedDepartment, isRegisterMode])
 
-  // Simplified phone number handler
-  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value
+  // Phone number formatter for Controller
+  const formatPhoneNumber = (value: string) => {
+    if (!value) return '+63'
     
     // If user deleted the +63 prefix, restore it
     if (!value.startsWith('+63')) {
@@ -150,9 +149,7 @@ export default function AuthPage() {
     const cleanNumber = numberPart.replace(/[^0-9]/g, '')
     
     // Limit to 10 digits after +63
-    const finalValue = '+63' + cleanNumber.slice(0, 10)
-    
-    registerForm.setValue('phone_number', finalValue)
+    return '+63' + cleanNumber.slice(0, 10)
   }
 
   const onLoginSubmit = async (data: UserLoginInput) => {
@@ -708,14 +705,22 @@ export default function AuthPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Phone Number
                   </label>
-                  <Input
-                    {...registerForm.register('phone_number')}
-                    placeholder="+63 9XX XXX XXXX"
-                    onChange={(e) => {
-                      registerForm.register('phone_number').onChange(e)
-                      handlePhoneNumberChange(e)
-                    }}
-                    className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.phone_number ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                  <Controller
+                    name="phone_number"
+                    control={registerForm.control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder="+63 9XX XXX XXXX"
+                        value={field.value || '+63'}
+                        onChange={(e) => {
+                          const formattedValue = formatPhoneNumber(e.target.value)
+                          field.onChange(formattedValue)
+                        }}
+                        maxLength={13}
+                        className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.phone_number ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                      />
+                    )}
                   />
                   {registerForm.formState.errors.phone_number && (
                     <p className="text-sm text-red-600 mt-1 animate-fade-in">{registerForm.formState.errors.phone_number.message}</p>
@@ -727,11 +732,17 @@ export default function AuthPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     School ID
                   </label>
-                  <Input
-                    {...registerForm.register('id_number')}
-                    placeholder="Enter your student ID"
-                    maxLength={10}
-                    className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.id_number ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                  <Controller
+                    name="id_number"
+                    control={registerForm.control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder="Enter your student ID"
+                        maxLength={10}
+                        className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.id_number ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                      />
+                    )}
                   />
                   {registerForm.formState.errors.id_number && (
                     <p className="text-sm text-red-600 mt-1 animate-fade-in">{registerForm.formState.errors.id_number.message}</p>
@@ -750,11 +761,17 @@ export default function AuthPage() {
                     Password
                   </label>
                   <div className="relative">
-                    <Input
-                      type={showPassword ? 'text' : 'password'}
-                      {...registerForm.register('password')}
-                      placeholder="Create a strong password"
-                      className={`py-2.5 pr-10 transition-all duration-200 ${registerForm.formState.errors.password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                    <Controller
+                      name="password"
+                      control={registerForm.control}
+                      render={({ field }) => (
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          {...field}
+                          placeholder="Create a strong password"
+                          className={`py-2.5 pr-10 transition-all duration-200 ${registerForm.formState.errors.password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                        />
+                      )}
                     />
                     <button
                       type="button"
@@ -778,11 +795,17 @@ export default function AuthPage() {
                     Confirm Password
                   </label>
                   <div className="relative">
-                    <Input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      {...registerForm.register('confirm_password')}
-                      placeholder="Confirm your password"
-                      className={`py-2.5 pr-10 transition-all duration-200 ${registerForm.formState.errors.confirm_password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                    <Controller
+                      name="confirm_password"
+                      control={registerForm.control}
+                      render={({ field }) => (
+                        <Input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          {...field}
+                          placeholder="Confirm your password"
+                          className={`py-2.5 pr-10 transition-all duration-200 ${registerForm.formState.errors.confirm_password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                        />
+                      )}
                     />
                     <button
                       type="button"
