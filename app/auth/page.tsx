@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
@@ -14,6 +14,7 @@ import { Eye, EyeOff, Loader2, MapPin, Users, Shield, Star, ShieldCheck } from '
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export default function AuthPage() {
   const searchParams = useSearchParams()
@@ -595,18 +596,25 @@ export default function AuthPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Year Level
                   </label>
-                  <select
-                    {...registerForm.register('year_level')}
-                    className="w-full p-2.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                  >
-                    <option value="">Select Year</option>
-                    <option value="1st">1st Year</option>
-                    <option value="2nd">2nd Year</option>
-                    <option value="3rd">3rd Year</option>
-                    <option value="4th">4th Year</option>
-                    <option value="5th">5th Year</option>
-                    <option value="6th">6th Year</option>
-                  </select>
+                  <Controller
+                    name="year_level"
+                    control={registerForm.control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full p-2.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                          <SelectValue placeholder="Select Year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1st">1st Year</SelectItem>
+                          <SelectItem value="2nd">2nd Year</SelectItem>
+                          <SelectItem value="3rd">3rd Year</SelectItem>
+                          <SelectItem value="4th">4th Year</SelectItem>
+                          <SelectItem value="5th">5th Year</SelectItem>
+                          <SelectItem value="6th">6th Year</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
 
                 {/* Department and Course - Mobile/Tablet: Stacked, Desktop: Side by side */}
@@ -615,17 +623,32 @@ export default function AuthPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Department
                     </label>
-                    <select
-                      {...registerForm.register('department_id', { valueAsNumber: true })}
-                      className="w-full p-2.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                    >
-                      <option value="">Select Department</option>
-                      {departments.map((dept) => (
-                        <option key={dept.department_id} value={dept.department_id}>
-                          {dept.name}
-                        </option>
-                      ))}
-                    </select>
+                    <Controller
+                      name="department_id"
+                      control={registerForm.control}
+                      render={({ field }) => (
+                        <Select 
+                          value={field.value ? field.value.toString() : ""} 
+                          onValueChange={(value) => {
+                            const departmentId = value ? Number(value) : undefined
+                            field.onChange(departmentId)
+                            // Reset course when department changes
+                            registerForm.setValue('course_id', undefined)
+                          }}
+                        >
+                          <SelectTrigger className="w-full p-2.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                            <SelectValue placeholder="Select Department" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {departments.map((dept) => (
+                              <SelectItem key={dept.department_id} value={dept.department_id.toString()}>
+                                {dept.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
                   </div>
 
                   {watchedRole !== 'staff' && (
@@ -633,17 +656,30 @@ export default function AuthPage() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Course
                       </label>
-                      <select
-                        {...registerForm.register('course_id', { valueAsNumber: true })}
-                        className="w-full p-2.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                      >
-                        <option value="">Select Course</option>
-                        {courses.map((course) => (
-                          <option key={course.course_id} value={course.course_id}>
-                            {course.name}
-                          </option>
-                        ))}
-                      </select>
+                      <Controller
+                        name="course_id"
+                        control={registerForm.control}
+                        render={({ field }) => (
+                          <Select 
+                            value={field.value ? field.value.toString() : ""} 
+                            onValueChange={(value) => {
+                              const courseId = value ? Number(value) : undefined
+                              field.onChange(courseId)
+                            }}
+                          >
+                            <SelectTrigger className="w-full p-2.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                              <SelectValue placeholder="Select Course" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {courses.map((course) => (
+                                <SelectItem key={course.course_id} value={course.course_id.toString()}>
+                                  {course.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
                     </div>
                   )}
                 </div>
