@@ -246,7 +246,7 @@ export default function AuthPage() {
         }
 
         toast.success('Successfully signed in!')
-        router.push(redirectTo)
+        router.replace(redirectTo)
         return // Redirect will happen, no need to toggle loading
       }
     } catch (error: any) {
@@ -286,7 +286,7 @@ export default function AuthPage() {
       
       // Redirect to admin dashboard
       console.log('Auth: Redirecting to admin dashboard...')
-      router.push('/admin/dashboard')
+      router.replace('/admin/dashboard')
       
     } catch (error) {
       console.error('Auth: Login error:', error)
@@ -1032,10 +1032,12 @@ export default function AuthPage() {
           {/* Initial Spacer - Shows welcome section */}
           <div className="h-screen flex items-end justify-center p-8">
             {/* Scroll Indicator */}
-            <div className="text-center mb-16">
-              <div className="text-white text-sm mb-2 drop-shadow-lg">Scroll up to sign in</div>
-              <div className="w-6 h-10 border-2 border-white border-opacity-50 rounded-full flex justify-center">
-                <div className="w-1 h-3 bg-white bg-opacity-70 rounded-full mt-2 animate-bounce"></div>
+            <div className="text-center fixed bottom-8 left-1/2 transform -translate-x-1/2">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 border border-white/30 shadow-lg flex items-center space-x-3">
+                <div className="w-5 h-7 border-2 border-white border-opacity-70 rounded-full flex justify-center">
+                  <div className="w-1 h-2.5 bg-white bg-opacity-90 rounded-full mt-1.5 animate-bounce"></div>
+                </div>
+                <div className="text-white text-sm font-medium drop-shadow-lg">Scroll up to sign in</div>
               </div>
             </div>
           </div>
