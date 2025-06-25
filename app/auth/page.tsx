@@ -292,72 +292,72 @@ export default function AuthPage() {
   }
 
   const WelcomeContent = () => (
-    <div className="flex flex-col h-full justify-center space-y-8">
+    <div className="flex flex-col h-full justify-center space-y-4 lg:space-y-8 px-4">
       {/* Logo */}
       <div className="text-center">
-        <div className="flex items-center justify-center space-x-3 mb-4">
-          <div className="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg border border-white border-opacity-30">
-            <span className="text-white font-bold text-xl">S</span>
+        <div className="flex items-center justify-center space-x-2 lg:space-x-3 mb-3 lg:mb-4">
+          <div className="w-10 h-10 lg:w-12 lg:h-12 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg border border-white border-opacity-30">
+            <span className="text-white font-bold text-lg lg:text-xl">S</span>
           </div>
-          <span className="text-3xl font-bold text-white">
+          <span className="text-2xl lg:text-3xl font-bold text-white">
             SPACELY
           </span>
         </div>
-        <h1 className="text-4xl font-bold text-white mb-4">
+        <h1 className="text-2xl lg:text-4xl font-bold text-white mb-3 lg:mb-4 leading-tight">
           Discover Affordable
           <span className="block text-blue-200">Budget-Friendly Rentals</span>
         </h1>
-        <p className="text-xl text-blue-100 mb-8 max-w-md mx-auto">
+        <p className="text-base lg:text-xl text-blue-100 mb-4 lg:mb-8 max-w-sm lg:max-w-md mx-auto leading-relaxed">
           Browse budget-friendly rentals near Mapua Malayan Colleges Mindanao — all listings are student-posted and not officially owned.
         </p>
       </div>
 
       {/* Features */}
-      <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-            <Shield className="w-5 h-5 text-white" />
+      <div className="space-y-3 lg:space-y-6">
+        <div className="flex items-center space-x-3 lg:space-x-4">
+          <div className="w-8 h-8 lg:w-10 lg:h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+            <Shield className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-white">Verified Listings</h3>
-            <p className="text-blue-200 text-sm">All properties reviewed for quality</p>
+            <h3 className="text-sm lg:text-base font-semibold text-white">Verified Listings</h3>
+            <p className="text-blue-200 text-xs lg:text-sm">All properties reviewed for quality</p>
           </div>
         </div>
         
-        <div className="flex items-center space-x-4">
-          <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-            <Users className="w-5 h-5 text-white" />
+        <div className="flex items-center space-x-3 lg:space-x-4">
+          <div className="w-8 h-8 lg:w-10 lg:h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+            <Users className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-white">Student Community</h3>
-            <p className="text-blue-200 text-sm">Connect with fellow students</p>
+            <h3 className="text-sm lg:text-base font-semibold text-white">Student Community</h3>
+            <p className="text-blue-200 text-xs lg:text-sm">Connect with fellow students</p>
           </div>
         </div>
         
-        <div className="flex items-center space-x-4">
-          <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-            <MapPin className="w-5 h-5 text-white" />
+        <div className="flex items-center space-x-3 lg:space-x-4">
+          <div className="w-8 h-8 lg:w-10 lg:h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+            <MapPin className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-white">Near Campus</h3>
-            <p className="text-blue-200 text-sm">Close to Mapua Malayan Colleges Mindanao</p>
+            <h3 className="text-sm lg:text-base font-semibold text-white">Near Campus</h3>
+            <p className="text-blue-200 text-xs lg:text-sm">Close to Mapua Malayan Colleges Mindanao</p>
           </div>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mt-8">
+      <div className="grid grid-cols-3 gap-3 lg:gap-4 mt-4 lg:mt-8">
         <div className="text-center">
-          <div className="text-2xl font-bold text-white">500+</div>
-          <div className="text-blue-200 text-sm">Listings</div>
+          <div className="text-lg lg:text-2xl font-bold text-white">500+</div>
+          <div className="text-blue-200 text-xs lg:text-sm">Listings</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-white">1000+</div>
-          <div className="text-blue-200 text-sm">Students</div>
+          <div className="text-lg lg:text-2xl font-bold text-white">1000+</div>
+          <div className="text-blue-200 text-xs lg:text-sm">Students</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-white">4.8★</div>
-          <div className="text-blue-200 text-sm">Rating</div>
+          <div className="text-lg lg:text-2xl font-bold text-white">4.8★</div>
+          <div className="text-blue-200 text-xs lg:text-sm">Rating</div>
         </div>
       </div>
     </div>
