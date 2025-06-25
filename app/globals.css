@@ -446,6 +446,34 @@
   transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Mobile Auth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+.mobile-scroll-container {
+  scroll-behavior: smooth;
+}
+
+.mobile-forms-overlay {
+  transform: translateY(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-blur-overlay {
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Hide scrollbar for mobile auth container */
+.mobile-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-scroll-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Map Search Box */
 .map-search-box {
   margin: 10px;

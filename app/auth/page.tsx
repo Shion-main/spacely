@@ -30,6 +30,7 @@ export default function AuthPage() {
   const [isTermsOpen, setIsTermsOpen] = useState(false)
   const [departments, setDepartments] = useState<any[]>([])
   const [courses, setCourses] = useState<any[]>([])
+  const [scrollProgress, setScrollProgress] = useState(0)
   const { signIn } = useAuth()
   const router = useRouter()
   const supabase = createClient()
@@ -42,6 +43,29 @@ export default function AuthPage() {
       toast.error('Email verification failed. Please try again or request a new verification link.')
     }
   }, [message, error])
+
+  // Handle mobile scroll blur effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollContainer = document.querySelector('.mobile-scroll-container')
+      const blurOverlay = document.querySelector('.mobile-blur-overlay')
+      
+      if (scrollContainer && blurOverlay) {
+        const scrollTop = scrollContainer.scrollTop
+        const scrollHeight = scrollContainer.scrollHeight - scrollContainer.clientHeight
+        const progress = Math.min(scrollTop / (scrollHeight * 0.3), 1) // Start blur at 30% scroll
+        
+        setScrollProgress(progress)
+        ;(blurOverlay as HTMLElement).style.opacity = progress.toString()
+      }
+    }
+
+    const scrollContainer = document.querySelector('.mobile-scroll-container')
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll)
+      return () => scrollContainer.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
 
   // Login form
   const loginForm = useForm<UserLoginInput>({
@@ -518,19 +542,20 @@ export default function AuthPage() {
   )
 
   const RegisterForm = () => (
-    <Card className="w-full max-w-4xl shadow-2xl border-0">
-      <CardHeader className="text-center pb-6">
-        <CardTitle className="text-xl font-bold text-gray-900">Create Account</CardTitle>
+    <Card className="w-full max-w-md lg:max-w-4xl shadow-2xl border-0">
+      <CardHeader className="text-center pb-4 lg:pb-6">
+        <CardTitle className="text-xl lg:text-2xl font-bold text-gray-900">Create Account</CardTitle>
         <CardDescription className="text-gray-600">
           Join the SPACELY community
         </CardDescription>
       </CardHeader>
       
-      <CardContent className="pb-10">
+      <CardContent className="pb-6 lg:pb-10">
         <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)}>
           <input type="hidden" value="student" {...registerForm.register('role')} />
-          <div className="grid grid-cols-2 gap-5">
-            {/* Left Column */}
+          {/* Mobile/Tablet: Single column, Desktop: Two columns */}
+          <div className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0">
+            {/* Left Column - Mobile: Full width, Desktop: Left half */}
             <div className="space-y-4">
               {/* Full Name */}
               <div>
@@ -563,166 +588,186 @@ export default function AuthPage() {
                 )}
               </div>
 
-              {/* Academic Fields */}
-              <div className={`grid gap-3 ${watchedRole === 'staff' ? 'grid-cols-2' : 'grid-cols-3'}`}>
+              {/* Academic Fields - Mobile/Tablet: Stacked, Desktop: Grid */}
+              <div className="space-y-4 lg:space-y-0">
+                {/* Year Level */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Year
+                    Year Level
                   </label>
                   <select
                     {...registerForm.register('year_level')}
                     className="w-full p-2.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                   >
-                    <option value="">Year</option>
-                    <option value="1st">1st</option>
-                    <option value="2nd">2nd</option>
-                    <option value="3rd">3rd</option>
-                    <option value="4th">4th</option>
-                    <option value="5th">5th</option>
-                    <option value="6th">6th</option>
+                    <option value="">Select Year</option>
+                    <option value="1st">1st Year</option>
+                    <option value="2nd">2nd Year</option>
+                    <option value="3rd">3rd Year</option>
+                    <option value="4th">4th Year</option>
+                    <option value="5th">5th Year</option>
+                    <option value="6th">6th Year</option>
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Department
-                  </label>
-                  <select
-                    {...registerForm.register('department_id', { valueAsNumber: true })}
-                    className="w-full p-2.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                  >
-                    <option value="">Dept</option>
-                    {departments.map((dept) => (
-                      <option key={dept.department_id} value={dept.department_id}>
-                        {dept.name.substring(0, 12)}...
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {watchedRole !== 'staff' && (
+                {/* Department and Course - Mobile/Tablet: Stacked, Desktop: Side by side */}
+                <div className={`space-y-4 lg:space-y-0 lg:grid lg:gap-3 ${watchedRole === 'staff' ? 'lg:grid-cols-1' : 'lg:grid-cols-2'}`}>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Course
+                      Department
                     </label>
                     <select
-                      {...registerForm.register('course_id', { valueAsNumber: true })}
+                      {...registerForm.register('department_id', { valueAsNumber: true })}
                       className="w-full p-2.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                     >
-                      <option value="">Course</option>
-                      {courses.map((course) => (
-                        <option key={course.course_id} value={course.course_id}>
-                          {course.name.substring(0, 10)}...
+                      <option value="">Select Department</option>
+                      {departments.map((dept) => (
+                        <option key={dept.department_id} value={dept.department_id}>
+                          {dept.name}
                         </option>
                       ))}
                     </select>
                   </div>
-                )}
-              </div>
-              {/* Password Creation Guidelines */}
-              <div className="text-sm text-gray-500">
-                Your password must be at least 8 characters long, include an uppercase letter, a number, and a special character.
-              </div>
-            </div>
 
-            {/* Right Column */}
-            <div className="space-y-4">
-              {/* Phone Number */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone
-                </label>
-                <Input
-                  {...registerForm.register('phone_number')}
-                  placeholder="+63XXXXXXXXXX"
-                  onChange={(e) => {
-                    registerForm.register('phone_number').onChange(e)
-                    handlePhoneNumberChange(e)
-                  }}
-                  className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.phone_number ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
-                />
-                {registerForm.formState.errors.phone_number && (
-                  <p className="text-sm text-red-600 mt-1 animate-fade-in">{registerForm.formState.errors.phone_number.message}</p>
-                )}
-              </div>
-
-              {/* School ID */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  School ID
-                </label>
-                <Input
-                  {...registerForm.register('id_number')}
-                  placeholder="1234567890"
-                  maxLength={10}
-                  className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.id_number ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
-                />
-                {registerForm.formState.errors.id_number && (
-                  <p className="text-sm text-red-600 mt-1 animate-fade-in">{registerForm.formState.errors.id_number.message}</p>
-                )}
-              </div>
-
-              {/* Password Fields */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? 'text' : 'password'}
-                    {...registerForm.register('password')}
-                    placeholder="Create password"
-                    className={`py-2.5 pr-10 transition-all duration-200 ${registerForm.formState.errors.password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center transition-colors duration-200 hover:text-blue-600"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
-                    )}
-                  </button>
+                  {watchedRole !== 'staff' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Course
+                      </label>
+                      <select
+                        {...registerForm.register('course_id', { valueAsNumber: true })}
+                        className="w-full p-2.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                      >
+                        <option value="">Select Course</option>
+                        {courses.map((course) => (
+                          <option key={course.course_id} value={course.course_id}>
+                            {course.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password
-                </label>
-                <div className="relative">
+              {/* Phone and School ID - Mobile/Tablet: Stacked, Desktop: Also in left column */}
+              <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-4">
+                {/* Phone Number */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
                   <Input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    {...registerForm.register('confirm_password')}
-                    placeholder="Confirm password"
-                    className={`py-2.5 pr-10 transition-all duration-200 ${registerForm.formState.errors.confirm_password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                    {...registerForm.register('phone_number')}
+                    placeholder="+63 9XX XXX XXXX"
+                    onChange={(e) => {
+                      registerForm.register('phone_number').onChange(e)
+                      handlePhoneNumberChange(e)
+                    }}
+                    className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.phone_number ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
                   />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center transition-colors duration-200 hover:text-blue-600"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
-                    )}
-                  </button>
+                  {registerForm.formState.errors.phone_number && (
+                    <p className="text-sm text-red-600 mt-1 animate-fade-in">{registerForm.formState.errors.phone_number.message}</p>
+                  )}
+                </div>
+
+                {/* School ID */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    School ID
+                  </label>
+                  <Input
+                    {...registerForm.register('id_number')}
+                    placeholder="Enter your student ID"
+                    maxLength={10}
+                    className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.id_number ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                  />
+                  {registerForm.formState.errors.id_number && (
+                    <p className="text-sm text-red-600 mt-1 animate-fade-in">{registerForm.formState.errors.id_number.message}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile: Continuation of form, Desktop: Right Column */}
+            <div className="space-y-4">
+
+              {/* Password Fields */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      {...registerForm.register('password')}
+                      placeholder="Create a strong password"
+                      className={`py-2.5 pr-10 transition-all duration-200 ${registerForm.formState.errors.password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center transition-colors duration-200 hover:text-blue-600"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                  {registerForm.formState.errors.password && (
+                    <p className="text-sm text-red-600 mt-1 animate-fade-in">{registerForm.formState.errors.password.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      {...registerForm.register('confirm_password')}
+                      placeholder="Confirm your password"
+                      className={`py-2.5 pr-10 transition-all duration-200 ${registerForm.formState.errors.confirm_password ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center transition-colors duration-200 hover:text-blue-600"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                  {registerForm.formState.errors.confirm_password && (
+                    <p className="text-sm text-red-600 mt-1 animate-fade-in">{registerForm.formState.errors.confirm_password.message}</p>
+                  )}
+                </div>
+
+                {/* Password Guidelines */}
+                <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg border">
+                  <div className="font-medium mb-1">Password Requirements:</div>
+                  <div>• At least 8 characters long</div>
+                  <div>• Include an uppercase letter</div>
+                  <div>• Include a number and special character</div>
                 </div>
               </div>
 
               {/* Terms & Conditions */}
-              <div className="flex items-start mt-2">
+              <div className="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg border">
                 <input
                   id="terms"
                   type="checkbox"
                   checked={termsAccepted}
                   onChange={(e) => setTermsAccepted(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 border-gray-300 rounded mt-1"
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded mt-0.5 flex-shrink-0"
                 />
-                <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
+                <label htmlFor="terms" className="text-sm text-gray-700 leading-relaxed">
                   I agree to the{' '}
                   <button
                     type="button"
@@ -735,11 +780,11 @@ export default function AuthPage() {
               </div>
 
               {/* Submit Button */}
-              <div className="mt-6">
+              <div className="pt-2">
                 <Button
                   type="submit"
-                  className="w-full spacely-btn-primary transition-all duration-200 hover:scale-105 py-3"
-                  disabled={isLoading}
+                  className="w-full spacely-btn-primary transition-all duration-200 hover:scale-105 py-3 font-semibold"
+                  disabled={isLoading || !termsAccepted}
                 >
                   {isLoading ? (
                     <>
@@ -837,25 +882,60 @@ export default function AuthPage() {
   )
 
   return (
-    <div className="min-h-screen bg-white flex flex-col md:flex-row relative overflow-hidden">
-      {/* Login Form - Fixed Left */}
-      <div className={`w-full md:w-1/2 flex items-center justify-center p-8 ${isRegisterMode ? 'hidden md:flex' : ''}`}>
-        <LoginForm />
+    <>
+      {/* Mobile/Tablet Layout - Overlay Scrolling Experience */}
+      <div className="lg:hidden relative h-screen overflow-hidden">
+        {/* Welcome Section - Fixed Background */}
+        <div className="fixed inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-8">
+          <WelcomeContent />
+        </div>
+
+        {/* Scrollable Container */}
+        <div className="relative h-screen overflow-y-scroll mobile-scroll-container">
+          {/* Initial Spacer - Shows welcome section */}
+          <div className="h-screen flex items-end justify-center p-8">
+            {/* Scroll Indicator */}
+            <div className="text-center mb-16">
+              <div className="text-white text-sm mb-2 drop-shadow-lg">Scroll up to sign in</div>
+              <div className="w-6 h-10 border-2 border-white border-opacity-50 rounded-full flex justify-center">
+                <div className="w-1 h-3 bg-white bg-opacity-70 rounded-full mt-2 animate-bounce"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Auth Forms Overlay */}
+          <div className="min-h-screen bg-white rounded-t-3xl shadow-2xl relative z-10 mobile-forms-overlay">
+            <div className="flex items-center justify-center min-h-screen p-8">
+              {isRegisterMode ? <RegisterForm /> : <LoginForm />}
+            </div>
+          </div>
+        </div>
+
+        {/* Blur Overlay - appears when forms are visible */}
+        <div className="fixed inset-0 bg-blue-900 bg-opacity-20 backdrop-blur-sm mobile-blur-overlay opacity-0 pointer-events-none transition-opacity duration-500"></div>
       </div>
 
-      {/* Register Form - Fixed Right */}
-      <div className={`w-full md:w-1/2 flex items-center justify-center p-8 ${isRegisterMode ? '' : 'hidden md:flex'}`}>
-        <RegisterForm />
-      </div>
+      {/* Desktop Layout - Original Sliding Design */}
+      <div className="hidden lg:flex min-h-screen bg-white flex-col lg:flex-row relative overflow-hidden">
+        {/* Login Form - Fixed Left */}
+        <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 ${isRegisterMode ? 'hidden lg:flex' : ''}`}>
+          <LoginForm />
+        </div>
 
-      {/* Welcome Panel - Sliding Overlay */}
-      <div className={`hidden md:flex absolute top-0 w-full md:w-1/2 h-full bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-8 smooth-slide z-10 ${
-        isRegisterMode 
-          ? 'left-0 transform translate-x-0' 
-          : 'left-1/2 transform translate-x-0'
-      }`}>
-        <WelcomeContent />
+        {/* Register Form - Fixed Right */}
+        <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 ${isRegisterMode ? '' : 'hidden lg:flex'}`}>
+          <RegisterForm />
+        </div>
+
+        {/* Welcome Panel - Sliding Overlay */}
+        <div className={`absolute top-0 w-full lg:w-1/2 h-full bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-8 smooth-slide z-10 ${
+          isRegisterMode 
+            ? 'left-0 transform translate-x-0' 
+            : 'left-1/2 transform translate-x-0'
+        }`}>
+          <WelcomeContent />
+        </div>
       </div>
-    </div>
+    </>
   )
 } 
