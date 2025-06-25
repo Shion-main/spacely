@@ -110,6 +110,10 @@ export default function AuthPage() {
 
   React.useEffect(() => {
     if (watchedDepartment && isRegisterMode) {
+      // Reset course selection when department changes
+      const currentValues = registerForm.getValues()
+      registerForm.setValue('course_id', undefined, { shouldDirty: false })
+      
       const fetchCourses = async () => {
         const { data, error } = await supabase
           .from('courses')
@@ -125,8 +129,10 @@ export default function AuthPage() {
       fetchCourses()
     } else {
       setCourses([])
+      // Also reset course when no department is selected
+      registerForm.setValue('course_id', undefined, { shouldDirty: false })
     }
-  }, [watchedDepartment, isRegisterMode])
+  }, [watchedDepartment, isRegisterMode, registerForm])
 
   // Simplified phone number handler
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -563,11 +569,17 @@ export default function AuthPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Full Name
                 </label>
-                <Input
-                  {...registerForm.register('full_name')}
-                  placeholder="Enter your full name"
-                  className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.full_name ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
-                />
+                                  <Controller
+                    name="full_name"
+                    control={registerForm.control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder="Enter your full name"
+                        className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.full_name ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                      />
+                    )}
+                  />
                 {registerForm.formState.errors.full_name && (
                   <p className="text-sm text-red-600 mt-1 animate-fade-in">{registerForm.formState.errors.full_name.message}</p>
                 )}
@@ -578,12 +590,18 @@ export default function AuthPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email
                 </label>
-                <Input
-                  type="email"
-                  {...registerForm.register('email')}
-                  placeholder="your.name@mcm.edu.ph"
-                  className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.email ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
-                />
+                                  <Controller
+                    name="email"
+                    control={registerForm.control}
+                    render={({ field }) => (
+                      <Input
+                        type="email"
+                        {...field}
+                        placeholder="your.name@mcm.edu.ph"
+                        className={`py-2.5 transition-all duration-200 ${registerForm.formState.errors.email ? 'border-red-300 ring-red-300' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
+                      />
+                    )}
+                  />
                 {registerForm.formState.errors.email && (
                   <p className="text-sm text-red-600 mt-1 animate-fade-in">{registerForm.formState.errors.email.message}</p>
                 )}
@@ -632,8 +650,6 @@ export default function AuthPage() {
                           onValueChange={(value) => {
                             const departmentId = value ? Number(value) : undefined
                             field.onChange(departmentId)
-                            // Reset course when department changes
-                            registerForm.setValue('course_id', undefined)
                           }}
                         >
                           <SelectTrigger className="w-full p-2.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-all duration-200">
