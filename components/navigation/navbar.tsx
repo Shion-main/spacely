@@ -9,6 +9,7 @@ import { Menu, X, Home, Plus, Heart, User, Shield, LogOut, Search, Filter } from
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { SearchBar } from './search-bar'
+import { MobileViewToggle } from '@/components/listings/view-toggle'
 
 interface RoomType {
   type_name: string
@@ -75,50 +76,59 @@ export function Navbar() {
             </div>
           </div>
 
-          {/* Right Section: User Actions */}
-          <div className="hidden lg:flex items-center space-x-3 sm:space-x-4">
-            {user ? (
-              <div className="flex items-center space-x-3">
-                <span className="text-sm spacely-text-muted">
-                  Hi, {profile?.full_name?.split(' ')[0] || 'User'}!
-                </span>
-                <Link href="/profile">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center space-x-1 spacely-text-primary hover:text-blue-600 hover:bg-gray-50"
-                  >
-                    <User className="w-4 h-4" />
-                    <span>Profile</span>
-                  </Button>
-                </Link>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="flex items-center space-x-1"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Sign Out</span>
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <Link href="/auth/login">
-                  <Button variant="ghost" size="sm" className="spacely-text-primary">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/auth/register">
-                  <Button size="sm" className="spacely-btn-primary">
-                    Sign Up
-                  </Button>
-                </Link>
+          {/* Right Section: User Actions and Mobile View Toggle */}
+          <div className="flex items-center space-x-3">
+            {/* Mobile View Toggle - Only on listings page */}
+            {pathname.startsWith('/listings') && (
+              <div className="md:hidden">
+                <MobileViewToggle />
               </div>
             )}
+            
+            <div className="hidden lg:flex items-center space-x-3 sm:space-x-4">
+              {user ? (
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm spacely-text-muted">
+                    Hi, {profile?.full_name?.split(' ')[0] || 'User'}!
+                  </span>
+                  <Link href="/profile">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center space-x-1 spacely-text-primary hover:text-blue-600 hover:bg-gray-50"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>Profile</span>
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSignOut}
+                    className="flex items-center space-x-1"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <Link href="/auth/login">
+                    <Button variant="ghost" size="sm" className="spacely-text-primary">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/auth/register">
+                    <Button size="sm" className="spacely-btn-primary">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="lg:hidden flex items-center">
+          <div className="lg:hidden flex items-center ml-3">
             <Button
               variant="ghost"
               size="sm"

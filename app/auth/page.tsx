@@ -427,7 +427,7 @@ export default function AuthPage() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Student/Staff
+              Student
             </button>
             <button
               type="button"

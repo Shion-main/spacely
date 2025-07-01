@@ -27,18 +27,21 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         pathname: window.location.pathname 
       })
       
-      // Don't do anything while auth is loading
+      // If auth is still loading, keep our loading state true but don't do anything else
       if (authLoading) {
         return
       }
-      
+
+      // No user means not admin
       if (!user) {
         console.log('[AdminAuthProvider] No user found')
         setIsAdmin(false)
         setLoading(false)
         
-        // Don't redirect immediately - let the auth system settle
-        // The admin login API should establish the session properly
+        // If on admin pages, redirect to auth
+        if (window.location.pathname.startsWith('/admin')) {
+          router.replace('/auth')
+        }
         return
       }
 
@@ -69,35 +72,41 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
           
           // Only redirect if we're on admin pages and confirmed not admin
           if (window.location.pathname.startsWith('/admin')) {
-            router.push('/?error=forbidden')
+            router.replace('/?error=forbidden')
           }
           return
         }
       }
-      
-      // If no profile data and not a system admin, wait a bit more but don't wait forever
-      // This handles the case where profile fetch is slow or failed
-      if (!profile && !isAdminEmail) {
-        // Give it a reasonable timeout
-        setTimeout(() => {
-          if (!profile) {
-            console.log('[AdminAuthProvider] Profile fetch timeout, denying access')
-            setIsAdmin(false)
-            setLoading(false)
-            if (window.location.pathname.startsWith('/admin')) {
-              router.push('/?error=forbidden')
-            }
+
+      // If we get here, we have a user but no profile yet
+      // Set a short timeout to wait for profile
+      const timeoutId = setTimeout(() => {
+        if (!profile) {
+          console.log('[AdminAuthProvider] Profile fetch timeout, denying access')
+          setIsAdmin(false)
+          setLoading(false)
+          if (window.location.pathname.startsWith('/admin')) {
+            router.replace('/?error=forbidden')
           }
-        }, 5000) // 5 second timeout
-      }
+        }
+      }, 2000) // Reduced timeout to 2 seconds
+
+      return () => clearTimeout(timeoutId)
     }
 
     checkAdminStatus()
   }, [user, profile, authLoading, router])
   
   const signOut = async () => {
-    // Use the main signOut function from AuthProvider
+    setLoading(true)
     await mainSignOut()
+    setIsAdmin(false)
+    router.replace('/auth')
+  }
+
+  // If we're not on an admin page, don't show loading state
+  if (!window.location.pathname.startsWith('/admin')) {
+    return <AdminAuthContext.Provider value={{ isAdmin, loading: false, signOut }}>{children}</AdminAuthContext.Provider>
   }
 
   const value = {
