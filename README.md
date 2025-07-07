@@ -1,4 +1,4 @@
-# Spacely – Campus-Community Marketplace 🏠
+# Spacely – Nearby Rentals
 
 > A full-stack platform that helps Mapúa Malayan Colleges Mindanao students discover budget-friendly rentals, post listings, and manage the process – with a powerful admin dashboard for moderation.
 
