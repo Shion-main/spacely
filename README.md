@@ -138,21 +138,6 @@ Full list → see `app/api/` directory.
 
 Every push to `main` triggers an automatic deployment.
 
----
-
-## 📷 Screenshots
-
-![Home](docs/screens/home.png)  
-![Admin Dashboard](docs/screens/admin.png)
-
----
-
-## 👥 Contributors
-
-• [Your Name] – Lead dev  
-• [Any others…]
-
----
 
 ## 📄 License
 
